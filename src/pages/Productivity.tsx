@@ -9,7 +9,7 @@ import { Progress } from "@/components/ui/progress";
 import { ArrowLeft, Plus, TrendingUp } from "lucide-react";
 import { toast } from "sonner";
 import llamaMascot from "@/assets/llama-mascot.jpg";
-import mountainBg from "@/assets/mountain-background.jpg";
+import rainbowMountain from "@/assets/rainbow-mountain.png";
 
 const MONTHLY_GOAL = 120;
 
@@ -146,10 +146,10 @@ const Productivity = () => {
                 </div>
 
                 {/* Mountain Progress Visualization */}
-                <div className="relative h-96 rounded-lg overflow-hidden">
+                <div className="relative h-96 rounded-lg overflow-hidden shadow-xl">
                   <img
-                    src={mountainBg}
-                    alt="Montanha"
+                    src={rainbowMountain}
+                    alt="Montanha Colorida"
                     className="absolute inset-0 w-full h-full object-cover"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-background/80 to-transparent" />
@@ -219,10 +219,10 @@ const Productivity = () => {
                 </div>
 
                 {/* Mountain Progress Visualization - Larger */}
-                <div className="relative h-[32rem] rounded-lg overflow-hidden">
+                <div className="relative h-[32rem] rounded-lg overflow-hidden shadow-xl">
                   <img
-                    src={mountainBg}
-                    alt="Montanha da Equipe"
+                    src={rainbowMountain}
+                    alt="Montanha Colorida da Equipe"
                     className="absolute inset-0 w-full h-full object-cover"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-background/80 to-transparent" />
