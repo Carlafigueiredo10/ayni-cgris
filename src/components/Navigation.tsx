@@ -9,13 +9,13 @@ import { Users, TrendingUp, Coffee, LogIn, ExternalLink, ChevronDown } from "luc
 
 const Navigation = () => {
   const navItems = [
+    { label: "Demandas Mensais", icon: TrendingUp, href: "/productivity" },
     { label: "Conheça nossa Equipe", icon: Users, href: "#equipe" },
     { label: "Sala do Café", icon: Coffee, href: "#cafe" },
     { label: "Links Úteis", icon: ExternalLink, href: "#links" },
   ];
 
   const pgdItems = [
-    { label: "Demandas Mensais", href: "/productivity" },
     { label: "Link pro PGD", href: "#pgd-link" },
     { label: "Faça seu plano de trabalho", href: "#plano-trabalho" },
     { label: "Manual de instruções", href: "#manual" },
