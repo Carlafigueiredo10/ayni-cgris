@@ -6,9 +6,8 @@ import { Mail, Lock } from "lucide-react";
 
 const LoginCard = () => {
   return (
-    <section id="login" className="py-20 px-6">
-      <div className="max-w-md mx-auto">
-        <Card className="shadow-card border-2 border-primary/10 animate-fade-in">
+    <div className="max-w-md mx-auto">
+      <Card className="shadow-card border-2 border-primary/10 animate-fade-in">
           <CardHeader className="space-y-2 text-center">
             <CardTitle className="text-3xl font-bold">Bem-vindo ao Ayni</CardTitle>
             <CardDescription className="text-base">
@@ -64,19 +63,18 @@ const LoginCard = () => {
               </p>
             </div>
           </CardContent>
-        </Card>
+      </Card>
 
-        {/* Mensagem inspiradora */}
-        <div className="mt-8 text-center space-y-2 animate-fade-in">
-          <p className="text-sm text-muted-foreground italic">
-            "No ayni, todos dão, todos recebem. A força está na união."
-          </p>
-          <p className="text-xs text-muted-foreground">
-            — Sabedoria Andina
-          </p>
-        </div>
+      {/* Mensagem inspiradora */}
+      <div className="mt-8 text-center space-y-2 animate-fade-in">
+        <p className="text-sm text-muted-foreground italic">
+          "No ayni, todos dão, todos recebem. A força está na união."
+        </p>
+        <p className="text-xs text-muted-foreground">
+          — Sabedoria Andina
+        </p>
       </div>
-    </section>
+    </div>
   );
 };
 
