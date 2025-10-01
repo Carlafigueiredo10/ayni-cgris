@@ -37,7 +37,7 @@ const HeroSection = () => {
           </h1>
           
           <p className="text-lg text-muted-foreground leading-relaxed">
-            Ayni é mais que uma plataforma. É uma filosofia de trabalho baseada na reciprocidade andina, 
+            Ayni é mais que uma plataforma. É uma filosofia de trabalho baseada na reciprocidade, 
             onde cada contribuição individual fortalece o coletivo e o sucesso é compartilhado por todos.
           </p>
 
