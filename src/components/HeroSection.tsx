@@ -26,7 +26,7 @@ const HeroSection = () => {
         <div className="space-y-6 animate-fade-in">
           <div className="inline-block">
             <span className="px-4 py-2 bg-accent/20 text-accent-foreground rounded-full text-sm font-semibold shadow-soft">
-              🤝 Reciprocidade Andina
+              🤝 Reciprocidade
             </span>
           </div>
           
@@ -43,7 +43,7 @@ const HeroSection = () => {
 
           <div className="flex flex-col sm:flex-row gap-4 pt-4">
             <button className="px-8 py-4 bg-gradient-hero text-white font-semibold rounded-lg shadow-soft hover:shadow-glow transition-smooth">
-              Começar Agora
+              Colaboração é a chave
             </button>
             <button className="px-8 py-4 bg-card text-foreground font-semibold rounded-lg shadow-card hover:shadow-soft transition-smooth border border-border">
               Saiba Mais

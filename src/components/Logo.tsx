@@ -9,7 +9,7 @@ const Logo = () => {
       </div>
       <div className="flex flex-col">
         <h1 className="text-2xl font-bold text-gradient-hero">Ayni</h1>
-        <p className="text-xs text-muted-foreground">Reciprocidade • Colaboração</p>
+        <p className="text-xs text-muted-foreground">Colaboração • Reciprocidade</p>
       </div>
     </div>
   );
