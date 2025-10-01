@@ -5,8 +5,10 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 const FeaturesPreview = () => {
+  const navigate = useNavigate();
   const [messages, setMessages] = useState([
     { id: 1, user: "Maria Silva", time: "10:30", message: "Bom dia, pessoal! ☕" },
     { id: 2, user: "João Santos", time: "10:32", message: "Bom dia! Alguém viu os novos procedimentos?" },
@@ -91,6 +93,7 @@ const FeaturesPreview = () => {
         <div className="grid md:grid-cols-2 gap-6">
           {features.map((feature, index) => {
             const isCoffeeRoom = feature.title === "Sala do Café";
+            const isWellness = feature.title === "Bem-estar";
             
             const CardWrapper = isCoffeeRoom ? Dialog : "div";
             const cardContent = (
@@ -98,6 +101,7 @@ const FeaturesPreview = () => {
                 key={feature.title}
                 className="shadow-card hover:shadow-glow transition-smooth border-2 border-primary/5 hover:border-primary/20 animate-fade-in cursor-pointer"
                 style={{ animationDelay: `${index * 0.1}s` }}
+                onClick={isWellness ? () => navigate("/wellness") : undefined}
               >
                 <CardHeader>
                   <div className={`w-14 h-14 ${feature.color} ${feature.textColor} rounded-xl flex items-center justify-center mb-4 shadow-soft`}>
@@ -110,8 +114,8 @@ const FeaturesPreview = () => {
                 </CardHeader>
                 <CardContent>
                   <button className="text-primary font-semibold hover:underline transition-smooth flex items-center gap-2">
-                    {isCoffeeRoom ? "Entrar na sala" : "Em breve"}
-                    {!isCoffeeRoom && (
+                    {isCoffeeRoom ? "Entrar na sala" : isWellness ? "Acessar recursos" : "Em breve"}
+                    {!isCoffeeRoom && !isWellness && (
                       <span className="text-xs bg-accent/20 text-accent-foreground px-2 py-1 rounded-full">
                         ✨ Novidade
                       </span>
