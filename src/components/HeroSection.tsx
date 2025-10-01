@@ -1,6 +1,8 @@
 import llamaMascot from "@/assets/llama-mascot.jpg";
 import mountainBg from "@/assets/mountain-background.jpg";
 import LoginCard from "@/components/LoginCard";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
 
 const HeroSection = () => {
   return (
@@ -76,9 +78,101 @@ const HeroSection = () => {
             </p>
 
             <div className="flex flex-col sm:flex-row gap-4 pt-4">
-              <button className="px-8 py-4 bg-gradient-hero text-white font-semibold rounded-lg shadow-soft hover:shadow-glow transition-smooth">
-                Colaboração é a chave
-              </button>
+              <Dialog>
+                <DialogTrigger asChild>
+                  <button className="px-8 py-4 bg-gradient-hero text-white font-semibold rounded-lg shadow-soft hover:shadow-glow transition-smooth">
+                    Colaboração é a chave
+                  </button>
+                </DialogTrigger>
+                <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
+                  <DialogHeader>
+                    <DialogTitle className="text-2xl font-bold text-gradient-hero">
+                      A Filosofia Ayni: Reciprocidade e Colaboração
+                    </DialogTitle>
+                    <DialogDescription className="text-base leading-relaxed space-y-4 pt-4">
+                      <div className="space-y-4">
+                        <p>
+                          <strong className="text-foreground">Ayni</strong> é uma palavra quéchua que significa "reciprocidade" ou "ajuda mútua". 
+                          É um princípio fundamental das culturas andinas que representa a ideia de que todos nós somos 
+                          parte de um sistema interconectado onde dar e receber são essenciais para o equilíbrio.
+                        </p>
+                        
+                        <div className="bg-accent/10 p-4 rounded-lg border-l-4 border-accent">
+                          <p className="italic text-foreground">
+                            "No ayni, todos dão, todos recebem. A força está na união."
+                          </p>
+                          <p className="text-xs mt-2">— Sabedoria Andina</p>
+                        </div>
+
+                        <h3 className="text-lg font-semibold text-foreground pt-2">🤝 Nossos Princípios</h3>
+                        
+                        <ul className="space-y-3 text-foreground">
+                          <li className="flex gap-3">
+                            <span className="text-primary font-bold">•</span>
+                            <div>
+                              <strong>Reciprocidade:</strong> Cada contribuição individual fortalece o coletivo. 
+                              Quando ajudamos os outros, também somos ajudados.
+                            </div>
+                          </li>
+                          <li className="flex gap-3">
+                            <span className="text-primary font-bold">•</span>
+                            <div>
+                              <strong>Colaboração:</strong> Trabalhamos juntos, compartilhando conhecimentos, 
+                              experiências e recursos para alcançar objetivos comuns.
+                            </div>
+                          </li>
+                          <li className="flex gap-3">
+                            <span className="text-primary font-bold">•</span>
+                            <div>
+                              <strong>Transparência:</strong> Mantemos uma comunicação aberta e honesta, 
+                              compartilhando informações e processos com toda a equipe.
+                            </div>
+                          </li>
+                          <li className="flex gap-3">
+                            <span className="text-primary font-bold">•</span>
+                            <div>
+                              <strong>Bem-estar coletivo:</strong> O sucesso individual está ligado ao sucesso 
+                              do grupo. Cuidamos uns dos outros.
+                            </div>
+                          </li>
+                        </ul>
+
+                        <h3 className="text-lg font-semibold text-foreground pt-2">💪 Na Prática</h3>
+                        
+                        <p>
+                          Esta plataforma foi criada para facilitar a colaboração entre nossa equipe através de:
+                        </p>
+                        
+                        <ul className="space-y-2 text-foreground">
+                          <li className="flex gap-2">
+                            <span>📚</span>
+                            <span>Biblioteca compartilhada de modelos e documentos</span>
+                          </li>
+                          <li className="flex gap-2">
+                            <span>🔄</span>
+                            <span>Processos e fluxos de trabalho transparentes</span>
+                          </li>
+                          <li className="flex gap-2">
+                            <span>📊</span>
+                            <span>Métricas e resultados acessíveis a todos</span>
+                          </li>
+                          <li className="flex gap-2">
+                            <span>☕</span>
+                            <span>Espaços para conexão e bem-estar da equipe</span>
+                          </li>
+                        </ul>
+
+                        <div className="bg-primary/10 p-4 rounded-lg mt-4">
+                          <p className="text-foreground font-semibold">
+                            Juntos somos mais fortes! Cada um de nós traz talentos únicos que, 
+                            quando compartilhados, criam algo maior do que a soma das partes.
+                          </p>
+                        </div>
+                      </div>
+                    </DialogDescription>
+                  </DialogHeader>
+                </DialogContent>
+              </Dialog>
               <button className="px-8 py-4 bg-card text-foreground font-semibold rounded-lg shadow-card hover:shadow-soft transition-smooth border border-border">
                 Saiba Mais
               </button>
