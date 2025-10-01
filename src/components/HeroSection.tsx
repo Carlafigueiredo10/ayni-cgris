@@ -1,7 +1,6 @@
 import llamaMascot from "@/assets/llama-mascot.jpg";
 import mountainBg from "@/assets/mountain-background.jpg";
 import LoginCard from "@/components/LoginCard";
-import { FileText, GitBranch } from "lucide-react";
 
 const HeroSection = () => {
   return (
@@ -43,25 +42,13 @@ const HeroSection = () => {
             onde cada contribuição individual fortalece o coletivo e o sucesso é compartilhado por todos.
           </p>
 
-          <div className="flex flex-col gap-4 pt-4">
-            <div className="flex flex-col sm:flex-row gap-4">
-              <button className="px-8 py-4 bg-gradient-hero text-white font-semibold rounded-lg shadow-soft hover:shadow-glow transition-smooth">
-                Colaboração é a chave
-              </button>
-              <button className="px-8 py-4 bg-card text-foreground font-semibold rounded-lg shadow-card hover:shadow-soft transition-smooth border border-border">
-                Saiba Mais
-              </button>
-            </div>
-            <div className="flex flex-col sm:flex-row gap-4">
-              <button className="flex items-center gap-2 px-6 py-3 bg-turquoise text-turquoise-foreground font-semibold rounded-lg shadow-soft hover:shadow-glow transition-smooth">
-                <FileText className="w-5 h-5" />
-                Biblioteca de Modelos: Notas Técnicas, Despachos e Formulários
-              </button>
-              <button className="flex items-center gap-2 px-6 py-3 bg-accent text-accent-foreground font-semibold rounded-lg shadow-soft hover:shadow-glow transition-smooth">
-                <GitBranch className="w-5 h-5" />
-                Fluxos e Procedimentos
-              </button>
-            </div>
+          <div className="flex flex-col sm:flex-row gap-4 pt-4">
+            <button className="px-8 py-4 bg-gradient-hero text-white font-semibold rounded-lg shadow-soft hover:shadow-glow transition-smooth">
+              Colaboração é a chave
+            </button>
+            <button className="px-8 py-4 bg-card text-foreground font-semibold rounded-lg shadow-card hover:shadow-soft transition-smooth border border-border">
+              Saiba Mais
+            </button>
           </div>
         </div>
 

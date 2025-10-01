@@ -1,8 +1,22 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { TrendingUp, Users, Coffee, Heart } from "lucide-react";
+import { TrendingUp, Users, Coffee, Heart, FileText, GitBranch } from "lucide-react";
 
 const FeaturesPreview = () => {
   const features = [
+    {
+      icon: FileText,
+      title: "Biblioteca de Modelos: Notas Técnicas, Despachos e Formulários",
+      description: "Acesse modelos prontos de documentos e formulários para agilizar seu trabalho.",
+      color: "bg-turquoise",
+      textColor: "text-turquoise-foreground",
+    },
+    {
+      icon: GitBranch,
+      title: "Fluxos e Procedimentos",
+      description: "Consulte os fluxos de trabalho e procedimentos da coordenação.",
+      color: "bg-accent",
+      textColor: "text-accent-foreground",
+    },
     {
       icon: TrendingUp,
       title: "CGRIS em Números",
