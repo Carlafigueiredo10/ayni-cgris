@@ -15,6 +15,7 @@ const Navigation = () => {
   ];
 
   const pgdItems = [
+    { label: "Demandas Mensais", href: "/productivity" },
     { label: "Link pro PGD", href: "#pgd-link" },
     { label: "Faça seu plano de trabalho", href: "#plano-trabalho" },
     { label: "Manual de instruções", href: "#manual" },
