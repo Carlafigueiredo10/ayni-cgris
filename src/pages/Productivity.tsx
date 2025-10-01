@@ -9,6 +9,7 @@ import { Progress } from "@/components/ui/progress";
 import { ArrowLeft, Plus, TrendingUp } from "lucide-react";
 import { toast } from "sonner";
 import llamaScene from "@/assets/llama-mountain-scene.png";
+import llamaCharacter from "@/assets/llama-character.png";
 
 const MONTHLY_GOAL = 120;
 
@@ -171,23 +172,32 @@ const Productivity = () => {
                     </div>
 
                     {/* Mountain scene on right */}
-                    <div className="md:w-2/3 relative">
-                      <div 
-                        className="transition-all duration-700 ease-out"
+                    <div className="md:w-2/3 relative h-[500px]">
+                      {/* Mountain background */}
+                      <img
+                        src={llamaScene}
+                        alt="Montanha"
+                        className="w-full h-full object-contain opacity-90"
+                      />
+                      
+                      {/* Llama climbing the steps */}
+                      <div
+                        className="absolute transition-all duration-700 ease-out z-20"
                         style={{
-                          filter: `brightness(${0.7 + (myProgress / 100) * 0.3})`,
-                          transform: `scale(${0.95 + (myProgress / 100) * 0.05})`
+                          bottom: `${Math.min(myProgress * 0.85, 85)}%`,
+                          left: `${45 + (myProgress * 0.1)}%`,
+                          transform: 'translateX(-50%)',
                         }}
                       >
                         <img
-                          src={llamaScene}
-                          alt="Lhama subindo a montanha"
-                          className="w-full h-auto max-h-[500px] object-contain drop-shadow-xl"
+                          src={llamaCharacter}
+                          alt="Lhama subindo"
+                          className="w-12 h-12 object-contain drop-shadow-lg"
                         />
                       </div>
                       
                       {myProgress >= 100 && (
-                        <div className="absolute top-4 left-1/2 -translate-x-1/2 animate-bounce">
+                        <div className="absolute top-8 left-1/2 -translate-x-1/2 animate-bounce z-30">
                           <span className="text-4xl">🎉</span>
                         </div>
                       )}
@@ -251,23 +261,32 @@ const Productivity = () => {
                     </div>
 
                     {/* Mountain scene on right - Bigger */}
-                    <div className="md:w-2/3 relative">
-                      <div 
-                        className="transition-all duration-700 ease-out"
+                    <div className="md:w-2/3 relative h-[600px]">
+                      {/* Mountain background */}
+                      <img
+                        src={llamaScene}
+                        alt="Montanha da equipe"
+                        className="w-full h-full object-contain opacity-90"
+                      />
+                      
+                      {/* Llama climbing the steps */}
+                      <div
+                        className="absolute transition-all duration-700 ease-out z-20"
                         style={{
-                          filter: `brightness(${0.7 + (teamProgress / 100) * 0.3})`,
-                          transform: `scale(${0.95 + (teamProgress / 100) * 0.05})`
+                          bottom: `${Math.min(teamProgress * 0.85, 85)}%`,
+                          left: `${45 + (teamProgress * 0.1)}%`,
+                          transform: 'translateX(-50%)',
                         }}
                       >
                         <img
-                          src={llamaScene}
-                          alt="Lhama da equipe subindo a montanha"
-                          className="w-full h-auto max-h-[600px] object-contain drop-shadow-2xl"
+                          src={llamaCharacter}
+                          alt="Lhama da equipe subindo"
+                          className="w-16 h-16 object-contain drop-shadow-lg"
                         />
                       </div>
                       
                       {teamProgress >= 100 && (
-                        <div className="absolute top-4 left-1/2 -translate-x-1/2 animate-bounce">
+                        <div className="absolute top-8 left-1/2 -translate-x-1/2 animate-bounce z-30">
                           <span className="text-5xl">🎉</span>
                         </div>
                       )}
