@@ -1,12 +1,30 @@
-// Update this page (the content is just a fallback if you fail to update the page)
+import Logo from "@/components/Logo";
+import Navigation from "@/components/Navigation";
+import HeroSection from "@/components/HeroSection";
+import LoginCard from "@/components/LoginCard";
+import FeaturesPreview from "@/components/FeaturesPreview";
+import Footer from "@/components/Footer";
 
 const Index = () => {
   return (
-    <div className="flex min-h-screen items-center justify-center bg-background">
-      <div className="text-center">
-        <h1 className="mb-4 text-4xl font-bold">Welcome to Your Blank App</h1>
-        <p className="text-xl text-muted-foreground">Start building your amazing project here!</p>
-      </div>
+    <div className="min-h-screen flex flex-col">
+      {/* Header */}
+      <header className="sticky top-0 z-50 bg-background/80 backdrop-blur-md border-b border-border shadow-soft">
+        <div className="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
+          <Logo />
+          <Navigation />
+        </div>
+      </header>
+
+      {/* Main Content */}
+      <main className="flex-1">
+        <HeroSection />
+        <FeaturesPreview />
+        <LoginCard />
+      </main>
+
+      {/* Footer */}
+      <Footer />
     </div>
   );
 };
