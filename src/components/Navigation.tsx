@@ -1,11 +1,12 @@
 import { Button } from "@/components/ui/button";
-import { Users, TrendingUp, Coffee, LogIn } from "lucide-react";
+import { Users, TrendingUp, Coffee, LogIn, ExternalLink } from "lucide-react";
 
 const Navigation = () => {
   const navItems = [
     { label: "CGRIS em Números", icon: TrendingUp, href: "#numeros" },
     { label: "Conheça nossa Equipe", icon: Users, href: "#equipe" },
     { label: "Sala do Café", icon: Coffee, href: "#cafe" },
+    { label: "Links Úteis", icon: ExternalLink, href: "#links" },
   ];
 
   return (
