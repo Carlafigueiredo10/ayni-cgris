@@ -55,7 +55,7 @@ const Productivity = () => {
               <TrendingUp className="w-5 h-5 text-white" />
             </div>
             <div>
-              <h1 className="text-xl font-bold text-foreground">Demandas Mensais</h1>
+              <h1 className="text-xl font-bold text-foreground">Registro de entregas</h1>
               <p className="text-sm text-muted-foreground">Acompanhe métricas e produtividade</p>
             </div>
           </div>

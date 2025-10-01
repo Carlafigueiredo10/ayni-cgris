@@ -9,7 +9,7 @@ import { Users, TrendingUp, Coffee, LogIn, ExternalLink, ChevronDown } from "luc
 
 const Navigation = () => {
   const navItems = [
-    { label: "Demandas Mensais", icon: TrendingUp, href: "/productivity" },
+    { label: "Registro de entregas", icon: TrendingUp, href: "/productivity" },
     { label: "Conheça nossa Equipe", icon: Users, href: "#equipe" },
     { label: "Sala do Café", icon: Coffee, href: "#cafe" },
     { label: "Links Úteis", icon: ExternalLink, href: "#links" },
