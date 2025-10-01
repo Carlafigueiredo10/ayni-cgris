@@ -22,30 +22,48 @@ const HeroSection = () => {
       <div className="absolute inset-0 bg-gradient-to-br from-background via-background/95 to-primary/5" />
 
       {/* Conteúdo */}
-      <div className="relative z-10 max-w-6xl mx-auto px-6 py-20 space-y-12">
-        {/* Lhama mascote centralizada */}
-        <div className="relative animate-float max-w-md mx-auto">
-          <div className="absolute inset-0 bg-gradient-sunset opacity-20 blur-3xl rounded-full" />
-          <img 
-            src={llamaMascot} 
-            alt="Lhama mascote do Ayni" 
-            className="relative rounded-2xl shadow-card w-full"
-          />
-          <div className="absolute -bottom-4 left-1/2 -translate-x-1/2 bg-highlight text-highlight-foreground px-6 py-3 rounded-full shadow-soft font-semibold animate-slide-in-right whitespace-nowrap">
-            💪 Juntos somos mais fortes!
+      <div className="relative z-10 max-w-7xl mx-auto px-6 py-12 space-y-16">
+        {/* Banner com Lhama e Notícias */}
+        <div className="grid md:grid-cols-2 gap-0 items-stretch rounded-2xl overflow-hidden shadow-card">
+          {/* Lhama à esquerda */}
+          <div className="relative bg-gradient-to-br from-primary/10 to-accent/10 p-8 flex items-center justify-center">
+            <div className="relative animate-float">
+              <div className="absolute inset-0 bg-gradient-sunset opacity-20 blur-3xl rounded-full" />
+              <img 
+                src={llamaMascot} 
+                alt="Lhama mascote do Ayni" 
+                className="relative rounded-2xl shadow-card w-full max-w-sm"
+              />
+              <div className="absolute -bottom-4 left-1/2 -translate-x-1/2 bg-highlight text-highlight-foreground px-6 py-3 rounded-full shadow-soft font-semibold animate-slide-in-right whitespace-nowrap">
+                💪 Juntos somos mais fortes!
+              </div>
+            </div>
           </div>
-        </div>
 
-        {/* Texto principal e Login lado a lado */}
-        <div className="grid md:grid-cols-2 gap-12 items-start">
-          {/* Texto principal */}
-          <div className="space-y-6 animate-fade-in">
-            <div className="inline-block">
-              <span className="px-4 py-2 bg-accent/20 text-accent-foreground rounded-full text-sm font-semibold shadow-soft">
+          {/* Caixa de Notícias à direita */}
+          <div className="bg-gradient-hero p-8 md:p-12 flex flex-col justify-center text-white">
+            <div className="inline-block mb-4">
+              <span className="px-4 py-2 bg-white/20 text-white rounded-full text-sm font-semibold shadow-soft">
                 🤝 Reciprocidade
               </span>
             </div>
-            
+            <h2 className="text-3xl md:text-4xl font-bold mb-4">
+              Principais Notícias
+            </h2>
+            <p className="text-lg text-white/90 leading-relaxed mb-6">
+              Fique por dentro das últimas atualizações, conquistas e iniciativas da nossa equipe. 
+              Juntos construímos um ambiente mais colaborativo e eficiente.
+            </p>
+            <button className="self-start px-6 py-3 bg-white text-primary font-semibold rounded-lg shadow-soft hover:shadow-glow transition-smooth">
+              Ver todas as notícias
+            </button>
+          </div>
+        </div>
+
+        {/* Seção de Boas-vindas e Login */}
+        <div className="grid md:grid-cols-2 gap-12 items-start">
+          {/* Texto principal */}
+          <div className="space-y-6 animate-fade-in">
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold leading-tight">
               Como podemos nos{" "}
               <span className="text-gradient-hero">ajudar</span> para sermos mais{" "}
