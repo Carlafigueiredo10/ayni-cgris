@@ -9,7 +9,7 @@ import { Progress } from "@/components/ui/progress";
 import { ArrowLeft, Plus, TrendingUp } from "lucide-react";
 import { toast } from "sonner";
 import llamaMascot from "@/assets/llama-mascot.jpg";
-import rainbowMountain from "@/assets/rainbow-mountain.png";
+import cartoonMountain from "@/assets/cartoon-mountain.png";
 
 const MONTHLY_GOAL = 120;
 
@@ -146,45 +146,45 @@ const Productivity = () => {
                 </div>
 
                 {/* Mountain Progress Visualization */}
-                <div className="relative h-96 rounded-lg overflow-hidden shadow-xl">
-                  <img
-                    src={rainbowMountain}
-                    alt="Montanha Colorida"
-                    className="absolute inset-0 w-full h-full object-cover"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-background/80 to-transparent" />
-                  
-                  {/* Llama climbing */}
-                  <div
-                    className="absolute transition-all duration-700 ease-out"
-                    style={{
-                      bottom: `${Math.min(myProgress, 100)}%`,
-                      left: "50%",
-                      transform: "translateX(-50%)",
-                    }}
-                  >
-                    <img
-                      src={llamaMascot}
-                      alt="Lhama"
-                      className="w-20 h-20 object-cover rounded-full border-4 border-white shadow-lg"
-                    />
-                  </div>
-
-                  {/* Goal marker */}
-                  <div className="absolute top-4 left-1/2 transform -translate-x-1/2 text-center">
-                    <div className="bg-white/90 px-4 py-2 rounded-full shadow-lg">
-                      <p className="text-sm font-bold text-foreground">Meta: {MONTHLY_GOAL} processos</p>
+                <div className="grid md:grid-cols-2 gap-6 items-center">
+                  {/* Left side - Stats */}
+                  <div className="space-y-4">
+                    <div className="bg-card p-6 rounded-lg border shadow-sm">
+                      <p className="text-sm text-muted-foreground mb-2">Progresso Atual</p>
+                      <p className="text-4xl font-bold text-primary mb-4">{myDeliveries} / {MONTHLY_GOAL}</p>
+                      <Progress value={myProgress} className="h-3 mb-2" />
+                      <p className="text-sm text-muted-foreground">
+                        {Math.round(myProgress)}% concluído
+                      </p>
+                    </div>
+                    
+                    <div className="bg-card p-6 rounded-lg border shadow-sm">
+                      <p className="text-sm font-semibold text-foreground mb-2">🎯 Meta do Mês</p>
+                      <p className="text-2xl font-bold">{MONTHLY_GOAL} processos</p>
                     </div>
                   </div>
 
-                  {/* Current progress */}
-                  <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 text-center w-full px-4">
-                    <div className="bg-white/90 px-6 py-3 rounded-lg shadow-lg max-w-sm mx-auto">
-                      <p className="text-2xl font-bold text-primary mb-2">{myDeliveries} / {MONTHLY_GOAL}</p>
-                      <Progress value={myProgress} className="h-3" />
-                      <p className="text-sm text-muted-foreground mt-2">
-                        {Math.round(myProgress)}% concluído
-                      </p>
+                  {/* Right side - Mountain with climbing llama */}
+                  <div className="relative h-[500px] flex items-end justify-center">
+                    <img
+                      src={cartoonMountain}
+                      alt="Montanha"
+                      className="absolute bottom-0 right-0 h-full w-auto object-contain"
+                    />
+                    
+                    {/* Llama climbing */}
+                    <div
+                      className="absolute transition-all duration-700 ease-out z-10"
+                      style={{
+                        bottom: `${Math.min(myProgress, 95)}%`,
+                        right: "35%",
+                      }}
+                    >
+                      <img
+                        src={llamaMascot}
+                        alt="Lhama"
+                        className="w-16 h-16 object-cover rounded-full border-4 border-white shadow-lg"
+                      />
                     </div>
                   </div>
                 </div>
@@ -219,45 +219,45 @@ const Productivity = () => {
                 </div>
 
                 {/* Mountain Progress Visualization - Larger */}
-                <div className="relative h-[32rem] rounded-lg overflow-hidden shadow-xl">
-                  <img
-                    src={rainbowMountain}
-                    alt="Montanha Colorida da Equipe"
-                    className="absolute inset-0 w-full h-full object-cover"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-background/80 to-transparent" />
-                  
-                  {/* Llama climbing */}
-                  <div
-                    className="absolute transition-all duration-700 ease-out"
-                    style={{
-                      bottom: `${Math.min(teamProgress, 100)}%`,
-                      left: "50%",
-                      transform: "translateX(-50%)",
-                    }}
-                  >
-                    <img
-                      src={llamaMascot}
-                      alt="Lhama da Equipe"
-                      className="w-24 h-24 object-cover rounded-full border-4 border-white shadow-lg"
-                    />
-                  </div>
-
-                  {/* Goal marker */}
-                  <div className="absolute top-4 left-1/2 transform -translate-x-1/2 text-center">
-                    <div className="bg-white/90 px-4 py-2 rounded-full shadow-lg">
-                      <p className="text-sm font-bold text-foreground">Meta: {MONTHLY_GOAL} processos</p>
+                <div className="grid md:grid-cols-2 gap-6 items-center">
+                  {/* Left side - Stats */}
+                  <div className="space-y-4">
+                    <div className="bg-card p-6 rounded-lg border shadow-sm">
+                      <p className="text-sm text-muted-foreground mb-2">Progresso da Equipe</p>
+                      <p className="text-4xl font-bold text-primary mb-4">{teamDeliveries} / {MONTHLY_GOAL}</p>
+                      <Progress value={teamProgress} className="h-3 mb-2" />
+                      <p className="text-sm text-muted-foreground">
+                        {Math.round(teamProgress)}% concluído
+                      </p>
+                    </div>
+                    
+                    <div className="bg-card p-6 rounded-lg border shadow-sm">
+                      <p className="text-sm font-semibold text-foreground mb-2">🎯 Meta do Mês</p>
+                      <p className="text-2xl font-bold">{MONTHLY_GOAL} processos</p>
                     </div>
                   </div>
 
-                  {/* Current progress */}
-                  <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 text-center w-full px-4">
-                    <div className="bg-white/90 px-6 py-3 rounded-lg shadow-lg max-w-sm mx-auto">
-                      <p className="text-2xl font-bold text-primary mb-2">{teamDeliveries} / {MONTHLY_GOAL}</p>
-                      <Progress value={teamProgress} className="h-3" />
-                      <p className="text-sm text-muted-foreground mt-2">
-                        {Math.round(teamProgress)}% concluído
-                      </p>
+                  {/* Right side - Mountain with climbing llama */}
+                  <div className="relative h-[600px] flex items-end justify-center">
+                    <img
+                      src={cartoonMountain}
+                      alt="Montanha da Equipe"
+                      className="absolute bottom-0 right-0 h-full w-auto object-contain"
+                    />
+                    
+                    {/* Llama climbing */}
+                    <div
+                      className="absolute transition-all duration-700 ease-out z-10"
+                      style={{
+                        bottom: `${Math.min(teamProgress, 95)}%`,
+                        right: "35%",
+                      }}
+                    >
+                      <img
+                        src={llamaMascot}
+                        alt="Lhama da Equipe"
+                        className="w-20 h-20 object-cover rounded-full border-4 border-white shadow-lg"
+                      />
                     </div>
                   </div>
                 </div>
