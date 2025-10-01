@@ -1,7 +1,6 @@
 import Logo from "@/components/Logo";
 import Navigation from "@/components/Navigation";
 import HeroSection from "@/components/HeroSection";
-import LoginCard from "@/components/LoginCard";
 import FeaturesPreview from "@/components/FeaturesPreview";
 import Footer from "@/components/Footer";
 
@@ -20,7 +19,6 @@ const Index = () => {
       <main className="flex-1">
         <HeroSection />
         <FeaturesPreview />
-        <LoginCard />
       </main>
 
       {/* Footer */}
