@@ -10,9 +10,6 @@ const LoginCard = () => {
       <div className="max-w-md mx-auto">
         <Card className="shadow-card border-2 border-primary/10 animate-fade-in">
           <CardHeader className="space-y-2 text-center">
-            <div className="mx-auto w-16 h-16 bg-gradient-hero rounded-full flex items-center justify-center mb-4 shadow-soft">
-              <span className="text-3xl">🦙</span>
-            </div>
             <CardTitle className="text-3xl font-bold">Bem-vindo ao Ayni</CardTitle>
             <CardDescription className="text-base">
               Entre para fazer parte da nossa comunidade colaborativa
