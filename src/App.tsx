@@ -8,6 +8,9 @@ import NotFound from "./pages/NotFound";
 import Wellness from "./pages/Wellness";
 import Productivity from "./pages/Productivity";
 
+// 🚀 Importando sua nova página
+import EmNumeros from "./pages/em_numeros";
+
 const queryClient = new QueryClient();
 
 const App = () => (
@@ -20,6 +23,8 @@ const App = () => (
           <Route path="/" element={<Index />} />
           <Route path="/wellness" element={<Wellness />} />
           <Route path="/productivity" element={<Productivity />} />
+          {/* 🚀 Nova rota para CGRIS em Números */}
+          <Route path="/em-numeros" element={<EmNumeros />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
@@ -29,3 +34,4 @@ const App = () => (
 );
 
 export default App;
+// 🚀 Importando sua nova página

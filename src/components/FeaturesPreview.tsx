@@ -21,14 +21,17 @@ const FeaturesPreview = () => {
   const handleSendMessage = () => {
     if (newMessage.trim()) {
       const now = new Date();
-      const time = `${now.getHours()}:${now.getMinutes().toString().padStart(2, '0')}`;
-      
-      setMessages([...messages, {
-        id: messages.length + 1,
-        user: "Você",
-        time: time,
-        message: newMessage
-      }]);
+      const time = `${now.getHours()}:${now.getMinutes().toString().padStart(2, "0")}`;
+
+      setMessages([
+        ...messages,
+        {
+          id: messages.length + 1,
+          user: "Você",
+          time: time,
+          message: newMessage,
+        },
+      ]);
       setNewMessage("");
     }
   };
@@ -94,28 +97,41 @@ const FeaturesPreview = () => {
           {features.map((feature, index) => {
             const isCoffeeRoom = feature.title === "Sala do Café";
             const isWellness = feature.title === "Bem-estar";
-            
+            const isEmNumeros = feature.title === "CGRIS em Números";
+
             const CardWrapper = isCoffeeRoom ? Dialog : "div";
             const cardContent = (
               <Card
                 key={feature.title}
                 className="shadow-card hover:shadow-glow transition-smooth border-2 border-primary/5 hover:border-primary/20 animate-fade-in cursor-pointer"
                 style={{ animationDelay: `${index * 0.1}s` }}
-                onClick={isWellness ? () => navigate("/wellness") : undefined}
+                onClick={
+                  isWellness
+                    ? () => navigate("/wellness")
+                    : isEmNumeros
+                    ? () => navigate("/em-numeros")
+                    : undefined
+                }
               >
                 <CardHeader>
-                  <div className={`w-14 h-14 ${feature.color} ${feature.textColor} rounded-xl flex items-center justify-center mb-4 shadow-soft`}>
+                  <div
+                    className={`w-14 h-14 ${feature.color} ${feature.textColor} rounded-xl flex items-center justify-center mb-4 shadow-soft`}
+                  >
                     <feature.icon className="w-7 h-7" />
                   </div>
                   <CardTitle className="text-xl font-bold">{feature.title}</CardTitle>
-                  <CardDescription className="text-base">
-                    {feature.description}
-                  </CardDescription>
+                  <CardDescription className="text-base">{feature.description}</CardDescription>
                 </CardHeader>
                 <CardContent>
                   <button className="text-primary font-semibold hover:underline transition-smooth flex items-center gap-2">
-                    {isCoffeeRoom ? "Entrar na sala" : isWellness ? "Acessar recursos" : "Em breve"}
-                    {!isCoffeeRoom && !isWellness && (
+                    {isCoffeeRoom
+                      ? "Entrar na sala"
+                      : isWellness
+                      ? "Acessar recursos"
+                      : isEmNumeros
+                      ? "Ver métricas"
+                      : "Em breve"}
+                    {!isCoffeeRoom && !isWellness && !isEmNumeros && (
                       <span className="text-xs bg-accent/20 text-accent-foreground px-2 py-1 rounded-full">
                         ✨ Novidade
                       </span>
@@ -128,9 +144,7 @@ const FeaturesPreview = () => {
             if (isCoffeeRoom) {
               return (
                 <Dialog key={feature.title}>
-                  <DialogTrigger asChild>
-                    {cardContent}
-                  </DialogTrigger>
+                  <DialogTrigger asChild>{cardContent}</DialogTrigger>
                   <DialogContent className="max-w-2xl max-h-[80vh]">
                     <DialogHeader>
                       <DialogTitle className="text-2xl font-bold flex items-center gap-2">
@@ -141,7 +155,7 @@ const FeaturesPreview = () => {
                         Um espaço informal para conversas, ideias e conexões entre colegas
                       </DialogDescription>
                     </DialogHeader>
-                    
+
                     <div className="flex flex-col h-[500px]">
                       <ScrollArea className="flex-1 pr-4">
                         <div className="space-y-4">
@@ -158,13 +172,13 @@ const FeaturesPreview = () => {
                           ))}
                         </div>
                       </ScrollArea>
-                      
+
                       <div className="flex gap-2 mt-4 pt-4 border-t">
                         <Input
                           placeholder="Digite sua mensagem..."
                           value={newMessage}
                           onChange={(e) => setNewMessage(e.target.value)}
-                          onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
+                          onKeyPress={(e) => e.key === "Enter" && handleSendMessage()}
                           className="flex-1"
                         />
                         <Button onClick={handleSendMessage} className="bg-gradient-hero text-white">
