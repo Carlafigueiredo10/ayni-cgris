@@ -98,6 +98,7 @@ const FeaturesPreview = () => {
             const isCoffeeRoom = feature.title === "Sala do Café";
             const isWellness = feature.title === "Bem-estar";
             const isEmNumeros = feature.title === "CGRIS em Números";
+            const isBiblioteca = feature.title === "Biblioteca de Modelos: Notas Técnicas, Despachos e Formulários";
 
             const CardWrapper = isCoffeeRoom ? Dialog : "div";
             const cardContent = (
@@ -110,6 +111,8 @@ const FeaturesPreview = () => {
                     ? () => navigate("/wellness")
                     : isEmNumeros
                     ? () => navigate("/em-numeros")
+                    : isBiblioteca
+                    ? () => navigate("/biblioteca")
                     : undefined
                 }
               >
@@ -130,8 +133,10 @@ const FeaturesPreview = () => {
                       ? "Acessar recursos"
                       : isEmNumeros
                       ? "Ver métricas"
+                      : isBiblioteca
+                      ? "Acessar biblioteca"
                       : "Em breve"}
-                    {!isCoffeeRoom && !isWellness && !isEmNumeros && (
+                    {!isCoffeeRoom && !isWellness && !isEmNumeros && !isBiblioteca && (
                       <span className="text-xs bg-accent/20 text-accent-foreground px-2 py-1 rounded-full">
                         ✨ Novidade
                       </span>

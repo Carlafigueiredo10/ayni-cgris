@@ -3,8 +3,11 @@ import mountainBg from "@/assets/mountain-background.jpg";
 import LoginCard from "@/components/LoginCard";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
+import React, { useState } from "react";
+import ChatModal from "./ChatModal";
 
 const HeroSection = () => {
+  const [chatOpen, setChatOpen] = useState(false);
   return (
     <section className="relative min-h-[600px] flex items-center justify-center overflow-hidden">
       {/* Background com montanhas */}
@@ -34,10 +37,14 @@ const HeroSection = () => {
               <img 
                 src={llamaMascot} 
                 alt="Lhama mascote do Ayni" 
-                className="relative rounded-2xl shadow-card w-full max-w-sm"
+                className="relative rounded-2xl shadow-card w-full max-w-sm cursor-pointer"
+                onClick={() => setChatOpen(true)}
               />
-              <div className="absolute -bottom-4 left-1/2 -translate-x-1/2 bg-highlight text-highlight-foreground px-6 py-3 rounded-full shadow-soft font-semibold animate-slide-in-right whitespace-nowrap">
-                💪 Juntos somos mais fortes!
+              <div
+                className="absolute -bottom-4 left-1/2 -translate-x-1/2 bg-highlight text-highlight-foreground px-6 py-3 rounded-full shadow-soft font-semibold animate-slide-in-right whitespace-nowrap cursor-pointer"
+                onClick={() => setChatOpen(true)}
+              >
+                💬 Tire suas dúvidas
               </div>
             </div>
           </div>
@@ -62,7 +69,8 @@ const HeroSection = () => {
           </div>
         </div>
 
-        {/* Seção de Boas-vindas e Login */}
+  {/* Seção de Boas-vindas e Login */}
+  <ChatModal open={chatOpen} onClose={() => setChatOpen(false)} />
         <div className="grid md:grid-cols-2 gap-12 items-start">
           {/* Texto principal */}
           <div className="space-y-6 animate-fade-in">

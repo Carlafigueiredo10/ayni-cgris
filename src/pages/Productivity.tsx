@@ -37,6 +37,16 @@ type Registro = {
   processo: string;
   status: "Concluído" | "Encaminhado" | "Solicitada informação externa";
   minutos: number; // ✅ MUDANÇA: horas → minutos
+  documentoOuAcao?: string[];
+  sistemaAjuste?: string;
+  tipoNatureza?: string;
+  tipoProcesso?: string;
+  tipoControle?: string;
+  motivoTempo?: string;
+  numPaginas?: string;
+  assunto?: string;
+  familiaridade?: string;
+  outroMotivo?: string;
 };
 
 const MONTHLY_GOAL = 120;
@@ -59,6 +69,16 @@ const Productivity = () => {
     processo: "",
     status: "Concluído",
     minutos: 0, // ✅ MUDANÇA: horas → minutos
+  documentoOuAcao: [],
+  sistemaAjuste: "",
+  tipoNatureza: "",
+  tipoProcesso: "",
+  tipoControle: "",
+  motivoTempo: "",
+  numPaginas: "",
+  assunto: "",
+  familiaridade: "",
+  outroMotivo: "",
   });
 
   const myProgress = (myDeliveries / MONTHLY_GOAL) * 100;
@@ -231,12 +251,52 @@ const Productivity = () => {
                 <CardDescription>Registre aqui suas entregas e acompanhe seu progresso</CardDescription>
               </CardHeader>
               <CardContent className="space-y-6">
-                {/* ✅ Formulário detalhado com MINUTOS */}
+                {/* ✅ Formulário detalhado com MINUTOS e Documentos */}
                 <div className="grid gap-4 sm:grid-cols-4">
                   <div>
                     <Label>Data</Label>
                     <Input type="date" value={novo.data} onChange={(e) => setNovo({ ...novo, data: e.target.value })} />
                   </div>
+                  <div>
+                    <Label>Judicial ou Controle</Label>
+                    <select
+                      value={novo.tipoNatureza}
+                      onChange={(e) => setNovo({ ...novo, tipoNatureza: e.target.value, tipoProcesso: "", tipoControle: "" })}
+                      className="w-full border rounded-md h-10 px-3 bg-background"
+                    >
+                      <option value="">Selecione</option>
+                      <option value="judicial">Judicial</option>
+                      <option value="controle">Controle</option>
+                    </select>
+                  </div>
+                  {novo.tipoNatureza === "judicial" && (
+                    <div>
+                      <Label>Tipo de processo</Label>
+                      <select
+                        value={novo.tipoProcesso}
+                        onChange={(e) => setNovo({ ...novo, tipoProcesso: e.target.value })}
+                        className="w-full border rounded-md h-10 px-3 bg-background"
+                      >
+                        <option value="">Selecione</option>
+                        <option value="subsídio">Subsídio</option>
+                        <option value="cumprimento">Cumprimento</option>
+                      </select>
+                    </div>
+                  )}
+                  {novo.tipoNatureza === "controle" && (
+                    <div>
+                      <Label>Indício ou processo</Label>
+                      <select
+                        value={novo.tipoControle}
+                        onChange={(e) => setNovo({ ...novo, tipoControle: e.target.value })}
+                        className="w-full border rounded-md h-10 px-3 bg-background"
+                      >
+                        <option value="">Selecione</option>
+                        <option value="indicio">Indício</option>
+                        <option value="processo">Processo</option>
+                      </select>
+                    </div>
+                  )}
                   <div className="sm:col-span-2">
                     <Label>Número do processo ou indício</Label>
                     <Input
@@ -269,12 +329,146 @@ const Productivity = () => {
                     <p className="text-xs text-muted-foreground mt-1">
                       Jornada: 480 min/dia (8h)
                     </p>
+                    {novo.minutos > 90 && (
+                      <div className="mt-4 space-y-3 p-3 border rounded-md bg-accent/10">
+                        <Label>O que te levou a gastar mais de 90 minutos nesse processo?</Label>
+                        <div className="flex flex-col gap-2">
+                          <label className="flex items-center gap-2">
+                            <input
+                              type="radio"
+                              name="motivoTempo"
+                              value="extenso"
+                              checked={novo.motivoTempo === "extenso"}
+                              onChange={() => setNovo({ ...novo, motivoTempo: "extenso" })}
+                            />
+                            Muito extenso
+                          </label>
+                          {novo.motivoTempo === "extenso" && (
+                            <div className="ml-6">
+                              <Label>Número de páginas</Label>
+                              <Input
+                                type="number"
+                                min="1"
+                                placeholder="Ex: 50"
+                                value={novo.numPaginas || ""}
+                                onChange={(e) => setNovo({ ...novo, numPaginas: e.target.value })}
+                              />
+                            </div>
+                          )}
+                          <label className="flex items-center gap-2">
+                            <input
+                              type="radio"
+                              name="motivoTempo"
+                              value="complexo"
+                              checked={novo.motivoTempo === "complexo"}
+                              onChange={() => setNovo({ ...novo, motivoTempo: "complexo" })}
+                            />
+                            Complexo
+                          </label>
+                          {novo.motivoTempo === "complexo" && (
+                            <div className="ml-6">
+                              <Label>Qual o assunto?</Label>
+                              <Input
+                                type="text"
+                                placeholder="Descreva o assunto"
+                                value={novo.assunto || ""}
+                                onChange={(e) => setNovo({ ...novo, assunto: e.target.value })}
+                              />
+                            </div>
+                          )}
+                          <label className="flex items-center gap-2">
+                            <input
+                              type="radio"
+                              name="motivoTempo"
+                              value="familiaridade"
+                              checked={novo.motivoTempo === "familiaridade"}
+                              onChange={() => setNovo({ ...novo, motivoTempo: "familiaridade" })}
+                            />
+                            Não tinha familiaridade com o assunto
+                          </label>
+                          {novo.motivoTempo === "familiaridade" && (
+                            <div className="ml-6">
+                              <Label>Qual assunto?</Label>
+                              <Input
+                                type="text"
+                                placeholder="Descreva o assunto"
+                                value={novo.familiaridade || ""}
+                                onChange={(e) => setNovo({ ...novo, familiaridade: e.target.value })}
+                              />
+                            </div>
+                          )}
+                          <label className="flex items-center gap-2">
+                            <input
+                              type="radio"
+                              name="motivoTempo"
+                              value="outro"
+                              checked={novo.motivoTempo === "outro"}
+                              onChange={() => setNovo({ ...novo, motivoTempo: "outro" })}
+                            />
+                            Outro
+                          </label>
+                          {novo.motivoTempo === "outro" && (
+                            <div className="ml-6">
+                              <Label>Descreva</Label>
+                              <Input
+                                type="text"
+                                placeholder="Outro motivo"
+                                value={novo.outroMotivo || ""}
+                                onChange={(e) => setNovo({ ...novo, outroMotivo: e.target.value })}
+                              />
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    )}
                   </div>
-                  <div className="sm:col-span-3 flex items-end">
-                    <Button onClick={adicionarRegistro} className="gap-2">
-                      <Plus className="w-4 h-4" /> Adicionar registro
-                    </Button>
+                  <div className="sm:col-span-4">
+                    <Label>Documento ou ação</Label>
+                    <div className="flex flex-wrap gap-4 mt-2">
+                      {[
+                        "Nota informativa",
+                        "Nota Técnica",
+                        "Ofício",
+                        "Despacho",
+                        "Ajuste no sistema"
+                      ].map((doc) => (
+                        <label key={doc} className="flex items-center gap-2">
+                          <input
+                            type="checkbox"
+                            checked={novo.documentoOuAcao?.includes(doc) || false}
+                            onChange={(e) => {
+                              if (e.target.checked) {
+                                setNovo({ ...novo, documentoOuAcao: [...(novo.documentoOuAcao || []), doc] });
+                              } else {
+                                setNovo({ ...novo, documentoOuAcao: (novo.documentoOuAcao || []).filter((d) => d !== doc) });
+                              }
+                            }}
+                          />
+                          <span>{doc}</span>
+                        </label>
+                      ))}
+                    </div>
+                    {novo.documentoOuAcao?.includes("Ajuste no sistema") && (
+                      <div className="mt-2">
+                        <Label>Qual sistema?</Label>
+                        <select
+                          value={novo.sistemaAjuste}
+                          onChange={(e) => setNovo({ ...novo, sistemaAjuste: e.target.value })}
+                          className="w-full border rounded-md h-10 px-3 bg-background"
+                        >
+                          <option value="">Selecione</option>
+                          <option value="SIAPE">SIAPE</option>
+                          <option value="SIGEPE AJ">SIGEPE AJ</option>
+                          <option value="SIGEPE">SIGEPE</option>
+                        </select>
+                      </div>
+                    )}
                   </div>
+                </div>
+                <div className="sm:col-span-3 flex items-end">
+                  <Button onClick={adicionarRegistro} className="gap-2">
+                    <Plus className="w-4 h-4" /> Adicionar registro
+                  </Button>
                 </div>
 
                 {/* Visualização de progresso (mantida) */}
