@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { supabase } from "@/lib/supabase";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -102,16 +103,79 @@ const Productivity = () => {
     setDeliveryAmount("");
   };
 
-  // ✅ Novo: adicionar registro detalhado (aba Individual)
-  const adicionarRegistro = () => {
-    if (!novo.data || !novo.processo || !novo.minutos) {
-      toast.error("Preencha data, processo e minutos."); // ✅ MUDANÇA
+  // Carregar registros do Supabase ao montar o componente
+  useEffect(() => {
+    carregarRegistros();
+  }, []);
+
+  const carregarRegistros = async () => {
+    const { data, error } = await supabase
+      .from('registros')
+      .select('*')
+      .order('created_at', { ascending: false });
+
+    if (error) {
+      console.error('Erro ao carregar registros:', error);
       return;
     }
+
+    if (data) {
+      const registrosFormatados = data.map(r => ({
+        servidor: r.servidor,
+        data: r.data,
+        processo: r.processo,
+        status: r.status,
+        minutos: r.minutos,
+        documentoOuAcao: r.documento_ou_acao,
+        sistemaAjuste: r.sistema_ajuste,
+        tipoNatureza: r.tipo_natureza,
+        tipoProcesso: r.tipo_processo,
+        tipoControle: r.tipo_controle,
+        motivoTempo: r.motivo_tempo,
+        numPaginas: r.num_paginas,
+        assunto: r.assunto,
+        familiaridade: r.familiaridade,
+        outroMotivo: r.outro_motivo,
+      }));
+      setRegistros(registrosFormatados);
+      setMyDeliveries(registrosFormatados.length);
+    }
+  };
+
+  // ✅ Novo: adicionar registro detalhado (aba Individual)
+  const adicionarRegistro = async () => {
+    if (!novo.data || !novo.processo || !novo.minutos) {
+      toast.error("Preencha data, processo e minutos.");
+      return;
+    }
+
+    const { error } = await supabase.from('registros').insert({
+      servidor: novo.servidor,
+      data: novo.data,
+      processo: novo.processo,
+      status: novo.status,
+      minutos: novo.minutos,
+      documento_ou_acao: novo.documentoOuAcao,
+      sistema_ajuste: novo.sistemaAjuste,
+      tipo_natureza: novo.tipoNatureza,
+      tipo_processo: novo.tipoProcesso,
+      tipo_controle: novo.tipoControle,
+      motivo_tempo: novo.motivoTempo,
+      num_paginas: novo.numPaginas,
+      assunto: novo.assunto,
+      familiaridade: novo.familiaridade,
+      outro_motivo: novo.outroMotivo,
+    });
+
+    if (error) {
+      toast.error("Erro ao salvar registro: " + error.message);
+      return;
+    }
+
     setRegistros((prev) => [...prev, novo]);
     setMyDeliveries((prev) => prev + 1);
-    toast.success("Registro adicionado");
-    setNovo({ servidor: "Servidor X", data: "", processo: "", status: "Concluído", minutos: 0 }); // ✅ MUDANÇA
+    toast.success("Registro salvo no banco!");
+    setNovo({ servidor: "Servidor X", data: "", processo: "", status: "Concluído", minutos: 0 });
   };
 
   // ✅ Exportações
