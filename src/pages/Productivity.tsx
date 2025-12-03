@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { supabase } from "@/lib/supabase";
+import { useAuth } from "@/contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -54,6 +55,7 @@ const MONTHLY_GOAL = 120;
 
 const Productivity = () => {
   const navigate = useNavigate();
+  const { user } = useAuth();
 
   // Estados existentes (mantidos)
   const [myDeliveries, setMyDeliveries] = useState(0);
@@ -112,6 +114,7 @@ const Productivity = () => {
     const { data, error } = await supabase
       .from('registros')
       .select('*')
+      .eq('user_id', user?.id)
       .order('created_at', { ascending: false });
 
     if (error) {
@@ -150,6 +153,7 @@ const Productivity = () => {
     }
 
     const { error } = await supabase.from('registros').insert({
+      user_id: user?.id,
       servidor: novo.servidor,
       data: novo.data,
       processo: novo.processo,

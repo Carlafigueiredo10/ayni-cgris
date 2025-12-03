@@ -2,48 +2,64 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { AuthProvider, useAuth } from "./contexts/AuthContext";
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 import Wellness from "./pages/Wellness";
 import Productivity from "./pages/Productivity";
+import Login from "./pages/Login";
 
 // 🚀 Importando sua nova página
 import EmNumeros from "./pages/em_numeros";
 import Biblioteca from "./pages/Biblioteca";
 import Solicitacoes from "./pages/Solicitacoes";
 import Agenda from "./pages/agenda";
-// import ForcaTrabalho from "./pages/ForcaTrabalho";
-// import ConhecaNossaEquipe from "./pages/ConhecaNossaEquipe";
 import Equipe from "./pages/Equipe";
 import PGD from "./pages/PGD";
+
 const queryClient = new QueryClient();
+
+// Componente para proteger rotas
+const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
+  const { user, loading } = useAuth();
+
+  if (loading) {
+    return <div className="min-h-screen flex items-center justify-center">Carregando...</div>;
+  }
+
+  if (!user) {
+    return <Navigate to="/login" />;
+  }
+
+  return <>{children}</>;
+};
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <Toaster />
-      <Sonner />
-      <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<Index />} />
-          <Route path="/wellness" element={<Wellness />} />
-          <Route path="/productivity" element={<Productivity />} />
-          {/* 🚀 Nova rota para CGRIS em Números */}
-          <Route path="/em-numeros" element={<EmNumeros />} />
-          <Route path="/pgd" element={<PGD />} />
-          <Route path="/equipe" element={<Equipe />} />
-          <Route path="/solicitacoes" element={<Solicitacoes />} />
-          <Route path="/solicitacao" element={<Solicitacoes />} />
-          <Route path="/biblioteca" element={<Biblioteca />} />
-          <Route path="/agenda" element={<Agenda />} />
-          {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-          <Route path="*" element={<NotFound />} />
-        </Routes>
-      </BrowserRouter>
-    </TooltipProvider>
+    <AuthProvider>
+      <TooltipProvider>
+        <Toaster />
+        <Sonner />
+        <BrowserRouter>
+          <Routes>
+            <Route path="/login" element={<Login />} />
+            <Route path="/" element={<ProtectedRoute><Index /></ProtectedRoute>} />
+            <Route path="/wellness" element={<ProtectedRoute><Wellness /></ProtectedRoute>} />
+            <Route path="/productivity" element={<ProtectedRoute><Productivity /></ProtectedRoute>} />
+            <Route path="/em-numeros" element={<ProtectedRoute><EmNumeros /></ProtectedRoute>} />
+            <Route path="/pgd" element={<ProtectedRoute><PGD /></ProtectedRoute>} />
+            <Route path="/equipe" element={<ProtectedRoute><Equipe /></ProtectedRoute>} />
+            <Route path="/solicitacoes" element={<ProtectedRoute><Solicitacoes /></ProtectedRoute>} />
+            <Route path="/solicitacao" element={<ProtectedRoute><Solicitacoes /></ProtectedRoute>} />
+            <Route path="/biblioteca" element={<ProtectedRoute><Biblioteca /></ProtectedRoute>} />
+            <Route path="/agenda" element={<ProtectedRoute><Agenda /></ProtectedRoute>} />
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </BrowserRouter>
+      </TooltipProvider>
+    </AuthProvider>
   </QueryClientProvider>
 );
 
 export default App;
-// 🚀 Importando sua nova página
