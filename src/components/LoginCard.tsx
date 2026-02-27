@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { supabase } from "@/lib/supabase";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -10,17 +10,27 @@ import { toast } from "sonner";
 
 const LoginCard = () => {
   const navigate = useNavigate();
+  const { search } = useLocation();
+  const nextParam = new URLSearchParams(search).get("next") || "/productivity";
   const [loading, setLoading] = useState(false);
   const [isSignUp, setIsSignUp] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [nome, setNome] = useState("");
 
+  const ALLOWED_DOMAIN = "@gestao.gov.br";
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
 
     if (isSignUp) {
+      if (!email.toLowerCase().endsWith(ALLOWED_DOMAIN)) {
+        toast.error(`Cadastro permitido apenas para emails ${ALLOWED_DOMAIN}`);
+        setLoading(false);
+        return;
+      }
+
       const { error } = await supabase.auth.signUp({
         email,
         password,
@@ -38,7 +48,7 @@ const LoginCard = () => {
         toast.error("Erro ao entrar: " + error.message);
       } else {
         toast.success("Login realizado!");
-        navigate("/productivity");
+        navigate(nextParam);
       }
     }
     setLoading(false);
@@ -79,7 +89,7 @@ const LoginCard = () => {
                 <Input
                   id="email"
                   type="email"
-                  placeholder="seu.email@mgi.gov.br"
+                  placeholder="seu.email@gestao.gov.br"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   className="pl-10 h-12 border-2"

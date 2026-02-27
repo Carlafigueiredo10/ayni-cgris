@@ -1,30 +1,23 @@
-import Logo from "@/components/Logo";
-import Navigation from "@/components/Navigation";
-import HeroSection from "@/components/HeroSection";
-import FeaturesPreview from "@/components/FeaturesPreview";
-import Footer from "@/components/Footer";
+import { Header } from "@/components/landing/Header";
+import { Hero } from "@/components/landing/Hero";
+import { Atuacao } from "@/components/landing/Atuacao";
+import { Sistema } from "@/components/landing/Sistema";
+import { Modules } from "@/components/landing/Modules";
+import { ComoFunciona } from "@/components/landing/ComoFunciona";
+import { Footer } from "@/components/landing/Footer";
 
-const Index = () => {
+export default function Index() {
   return (
-    <div className="min-h-screen flex flex-col">
-      {/* Header */}
-      <header className="sticky top-0 z-50 bg-background/80 backdrop-blur-md border-b border-border shadow-soft">
-        <div className="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
-          <Logo />
-          <Navigation />
-        </div>
-      </header>
-
-      {/* Main Content */}
-      <main className="flex-1">
-        <HeroSection />
-        <FeaturesPreview />
+    <div className="min-h-screen bg-background">
+      <Header />
+      <main>
+        <Hero />
+        <Atuacao />
+        <Sistema />
+        <Modules />
+        <ComoFunciona />
       </main>
-
-      {/* Footer */}
       <Footer />
     </div>
   );
-};
-
-export default Index;
+}

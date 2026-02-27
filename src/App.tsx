@@ -2,25 +2,26 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate, Outlet } from "react-router-dom";
 import { AuthProvider, useAuth } from "./contexts/AuthContext";
+import PrivateLayout from "./layouts/PrivateLayout";
 import Index from "./pages/Index";
+import Login from "./pages/Login";
 import NotFound from "./pages/NotFound";
 import Wellness from "./pages/Wellness";
 import Productivity from "./pages/Productivity";
-
-// 🚀 Importando sua nova página
 import EmNumeros from "./pages/em_numeros";
 import Biblioteca from "./pages/Biblioteca";
 import Solicitacoes from "./pages/Solicitacoes";
 import Agenda from "./pages/agenda";
 import Equipe from "./pages/Equipe";
 import PGD from "./pages/PGD";
+import Admin from "./pages/Admin";
+import Relatorios from "./pages/Relatorios";
 
 const queryClient = new QueryClient();
 
-// Componente para proteger rotas
-const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
+function ProtectedRoute() {
   const { user, loading } = useAuth();
 
   if (loading) {
@@ -28,11 +29,11 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   }
 
   if (!user) {
-    return <Navigate to="/" />;
+    return <Navigate to="/login" replace />;
   }
 
-  return <>{children}</>;
-};
+  return <Outlet />;
+}
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
@@ -43,15 +44,23 @@ const App = () => (
         <BrowserRouter>
           <Routes>
             <Route path="/" element={<Index />} />
-            <Route path="/wellness" element={<ProtectedRoute><Wellness /></ProtectedRoute>} />
-            <Route path="/productivity" element={<ProtectedRoute><Productivity /></ProtectedRoute>} />
-            <Route path="/em-numeros" element={<ProtectedRoute><EmNumeros /></ProtectedRoute>} />
-            <Route path="/pgd" element={<ProtectedRoute><PGD /></ProtectedRoute>} />
-            <Route path="/equipe" element={<ProtectedRoute><Equipe /></ProtectedRoute>} />
-            <Route path="/solicitacoes" element={<ProtectedRoute><Solicitacoes /></ProtectedRoute>} />
-            <Route path="/solicitacao" element={<ProtectedRoute><Solicitacoes /></ProtectedRoute>} />
-            <Route path="/biblioteca" element={<ProtectedRoute><Biblioteca /></ProtectedRoute>} />
-            <Route path="/agenda" element={<ProtectedRoute><Agenda /></ProtectedRoute>} />
+            <Route path="/login" element={<Login />} />
+
+            {/* TODO: restaurar ProtectedRoute depois da demo */}
+            <Route element={<PrivateLayout />}>
+              <Route path="/wellness" element={<Wellness />} />
+              <Route path="/productivity" element={<Productivity />} />
+              <Route path="/em-numeros" element={<EmNumeros />} />
+              <Route path="/pgd" element={<PGD />} />
+              <Route path="/equipe" element={<Equipe />} />
+              <Route path="/solicitacoes" element={<Solicitacoes />} />
+              <Route path="/solicitacao" element={<Solicitacoes />} />
+              <Route path="/biblioteca" element={<Biblioteca />} />
+              <Route path="/agenda" element={<Agenda />} />
+              <Route path="/relatorios" element={<Relatorios />} />
+              <Route path="/admin" element={<Admin />} />
+            </Route>
+
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>
