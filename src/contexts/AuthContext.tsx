@@ -40,8 +40,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   useEffect(() => {
     let mounted = true;
 
-    console.log("[Auth] Iniciando...");
-
     // Safety: se nada resolver em 6s, desbloqueia a UI
     const timeout = setTimeout(() => {
       if (mounted && loading) {
@@ -51,11 +49,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }, 6000);
 
     async function loadProfile(userId: string) {
-      console.log("[Auth] Buscando perfil para", userId);
       try {
         // Tenta RPC primeiro (SECURITY DEFINER, bypassa RLS)
         const { data: rpcData, error: rpcErr } = await supabase.rpc("get_my_profile");
-        console.log("[Auth] RPC resultado:", { data: rpcData, error: rpcErr });
 
         if (!mounted) return;
 
@@ -65,13 +61,11 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         }
 
         // Fallback: query direta (policy simples: id = auth.uid())
-        console.log("[Auth] RPC falhou, tentando query direta...");
         const { data, error } = await supabase
           .from("profiles")
           .select("id, display_name, email, team_id, role")
           .eq("id", userId)
           .single();
-        console.log("[Auth] Query direta resultado:", { data, error });
 
         if (!mounted) return;
 
@@ -89,9 +83,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
     async function init() {
       try {
-        console.log("[Auth] getSession...");
-        const { data: { session }, error } = await supabase.auth.getSession();
-        console.log("[Auth] getSession resultado:", { session: !!session, error });
+        const { data: { session } } = await supabase.auth.getSession();
 
         if (!mounted) return;
 
@@ -105,7 +97,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         console.error("[Auth] getSession falhou:", err);
       } finally {
         if (mounted) {
-          console.log("[Auth] setLoading(false)");
           setLoading(false);
           clearTimeout(timeout);
         }
@@ -117,14 +108,13 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange(async (_event, session) => {
-      console.log("[Auth] onAuthStateChange:", _event);
       if (!mounted) return;
 
       const currentUser = session?.user ?? null;
       setUser(currentUser);
 
       if (currentUser) {
-        await loadProfile();
+        await loadProfile(currentUser.id);
       } else {
         setProfile(null);
       }

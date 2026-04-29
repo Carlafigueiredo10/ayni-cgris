@@ -46,19 +46,20 @@ const App = () => (
             <Route path="/" element={<Index />} />
             <Route path="/login" element={<Login />} />
 
-            {/* TODO: restaurar ProtectedRoute depois da demo */}
-            <Route element={<PrivateLayout />}>
-              <Route path="/wellness" element={<Wellness />} />
-              <Route path="/productivity" element={<Productivity />} />
-              <Route path="/em-numeros" element={<EmNumeros />} />
-              <Route path="/pgd" element={<PGD />} />
-              <Route path="/equipe" element={<Equipe />} />
-              <Route path="/solicitacoes" element={<Solicitacoes />} />
-              <Route path="/solicitacao" element={<Solicitacoes />} />
-              <Route path="/biblioteca" element={<Biblioteca />} />
-              <Route path="/agenda" element={<Agenda />} />
-              <Route path="/relatorios" element={<Relatorios />} />
-              <Route path="/admin" element={<Admin />} />
+            <Route element={<ProtectedRoute />}>
+              <Route element={<PrivateLayout />}>
+                <Route path="/wellness" element={<Wellness />} />
+                <Route path="/productivity" element={<Productivity />} />
+                <Route path="/em-numeros" element={<EmNumeros />} />
+                <Route path="/pgd" element={<PGD />} />
+                <Route path="/equipe" element={<Equipe />} />
+                <Route path="/solicitacoes" element={<Solicitacoes />} />
+                <Route path="/solicitacao" element={<Solicitacoes />} />
+                <Route path="/biblioteca" element={<Biblioteca />} />
+                <Route path="/agenda" element={<Agenda />} />
+                <Route path="/relatorios" element={<Relatorios />} />
+                <Route path="/admin" element={<Admin />} />
+              </Route>
             </Route>
 
             <Route path="*" element={<NotFound />} />

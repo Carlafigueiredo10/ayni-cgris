@@ -1,6 +1,6 @@
 import { Outlet } from "react-router-dom";
 import Navigation from "@/components/Navigation";
-// import TeamGuard from "@/components/guards/TeamGuard"; // TODO: restaurar depois da demo
+import TeamGuard from "@/components/guards/TeamGuard";
 
 export default function PrivateLayout() {
   return (
@@ -24,7 +24,9 @@ export default function PrivateLayout() {
       </header>
 
       <main className="mx-auto max-w-6xl px-6 py-8">
-        <Outlet />
+        <TeamGuard>
+          <Outlet />
+        </TeamGuard>
       </main>
     </div>
   );
