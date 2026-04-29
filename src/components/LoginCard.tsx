@@ -8,12 +8,14 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Mail, Lock, User } from "lucide-react";
 import { toast } from "sonner";
 
+type Mode = "signin" | "signup" | "forgot";
+
 const LoginCard = () => {
   const navigate = useNavigate();
   const { search } = useLocation();
   const nextParam = new URLSearchParams(search).get("next") || "/productivity";
   const [loading, setLoading] = useState(false);
-  const [isSignUp, setIsSignUp] = useState(false);
+  const [mode, setMode] = useState<Mode>("signin");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [nome, setNome] = useState("");
@@ -24,7 +26,7 @@ const LoginCard = () => {
     e.preventDefault();
     setLoading(true);
 
-    if (isSignUp) {
+    if (mode === "signup") {
       if (!email.toLowerCase().endsWith(ALLOWED_DOMAIN)) {
         toast.error(`Cadastro permitido apenas para emails ${ALLOWED_DOMAIN}`);
         setLoading(false);
@@ -40,9 +42,9 @@ const LoginCard = () => {
         toast.error("Erro ao cadastrar: " + error.message);
       } else {
         toast.success("Cadastro realizado! Verifique seu email.");
-        setIsSignUp(false);
+        setMode("signin");
       }
-    } else {
+    } else if (mode === "signin") {
       const { error } = await supabase.auth.signInWithPassword({ email, password });
       if (error) {
         toast.error("Erro ao entrar: " + error.message);
@@ -50,22 +52,47 @@ const LoginCard = () => {
         toast.success("Login realizado!");
         navigate(nextParam);
       }
+    } else if (mode === "forgot") {
+      if (!email.toLowerCase().endsWith(ALLOWED_DOMAIN)) {
+        toast.error(`Recuperacao disponivel apenas para emails ${ALLOWED_DOMAIN}`);
+        setLoading(false);
+        return;
+      }
+
+      const { error } = await supabase.auth.resetPasswordForEmail(email, {
+        redirectTo: `${window.location.origin}/reset-password`,
+      });
+      if (error) {
+        toast.error("Erro ao enviar email: " + error.message);
+      } else {
+        // Mensagem neutra: nao confirma se o email existe (anti-enumeracao)
+        toast.success("Se a conta existir, voce recebera um email com instrucoes.");
+        setMode("signin");
+      }
     }
     setLoading(false);
   };
+
+  const title =
+    mode === "signup" ? "Crie sua conta" :
+    mode === "forgot" ? "Recuperar senha" :
+    "Entre na comunidade colaborativa";
+
+  const submitLabel = loading ? "Aguarde..." :
+    mode === "signup" ? "Criar conta" :
+    mode === "forgot" ? "Enviar email de recuperacao" :
+    "Entrar na Plataforma";
 
   return (
     <div className="max-w-md mx-auto">
       <Card className="shadow-card border-2 border-primary/10 animate-fade-in">
         <CardHeader className="space-y-2 text-center">
           <CardTitle className="text-3xl font-bold">Bem-vindo ao Ayni</CardTitle>
-          <CardDescription className="text-base">
-            {isSignUp ? "Crie sua conta" : "Entre na comunidade colaborativa"}
-          </CardDescription>
+          <CardDescription className="text-base">{title}</CardDescription>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
-            {isSignUp && (
+            {mode === "signup" && (
               <div className="space-y-2">
                 <Label htmlFor="nome">Nome</Label>
                 <div className="relative">
@@ -98,41 +125,82 @@ const LoginCard = () => {
               </div>
             </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="password">Senha</Label>
-              <div className="relative">
-                <Lock className="absolute left-3 top-3 h-5 w-5 text-muted-foreground" />
-                <Input
-                  id="password"
-                  type="password"
-                  placeholder="••••••••"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  className="pl-10 h-12 border-2"
-                  minLength={6}
-                  required
-                />
+            {mode !== "forgot" && (
+              <div className="space-y-2">
+                <Label htmlFor="password">Senha</Label>
+                <div className="relative">
+                  <Lock className="absolute left-3 top-3 h-5 w-5 text-muted-foreground" />
+                  <Input
+                    id="password"
+                    type="password"
+                    placeholder="••••••••"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    className="pl-10 h-12 border-2"
+                    minLength={6}
+                    required
+                  />
+                </div>
               </div>
-            </div>
+            )}
 
             <Button
               type="submit"
               disabled={loading}
               className="w-full h-12 bg-gradient-hero text-white font-semibold"
             >
-              {loading ? "Aguarde..." : (isSignUp ? "Criar conta" : "Entrar na Plataforma")}
+              {submitLabel}
             </Button>
 
-            <p className="text-sm text-center text-muted-foreground">
-              {isSignUp ? "Já tem conta? " : "Primeiro acesso? "}
-              <button
-                type="button"
-                onClick={() => setIsSignUp(!isSignUp)}
-                className="text-primary font-semibold hover:underline"
-              >
-                {isSignUp ? "Entrar" : "Criar conta"}
-              </button>
-            </p>
+            {mode === "signin" && (
+              <div className="space-y-1 text-center text-sm">
+                <p className="text-muted-foreground">
+                  Primeiro acesso?{" "}
+                  <button
+                    type="button"
+                    onClick={() => setMode("signup")}
+                    className="text-primary font-semibold hover:underline"
+                  >
+                    Criar conta
+                  </button>
+                </p>
+                <p className="text-muted-foreground">
+                  <button
+                    type="button"
+                    onClick={() => setMode("forgot")}
+                    className="text-primary font-semibold hover:underline"
+                  >
+                    Esqueci minha senha
+                  </button>
+                </p>
+              </div>
+            )}
+
+            {mode === "signup" && (
+              <p className="text-sm text-center text-muted-foreground">
+                Ja tem conta?{" "}
+                <button
+                  type="button"
+                  onClick={() => setMode("signin")}
+                  className="text-primary font-semibold hover:underline"
+                >
+                  Entrar
+                </button>
+              </p>
+            )}
+
+            {mode === "forgot" && (
+              <p className="text-sm text-center text-muted-foreground">
+                Lembrou a senha?{" "}
+                <button
+                  type="button"
+                  onClick={() => setMode("signin")}
+                  className="text-primary font-semibold hover:underline"
+                >
+                  Voltar ao login
+                </button>
+              </p>
+            )}
           </form>
         </CardContent>
       </Card>
