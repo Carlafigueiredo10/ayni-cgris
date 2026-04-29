@@ -1,10 +1,10 @@
 import { useState } from "react";
-import { Navigate } from "react-router-dom";
+import { Navigate, Link } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { useAdmin } from "@/hooks/use-admin";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Settings, Users, UserPlus } from "lucide-react";
+import { Settings, Users, UserPlus, ArrowRight } from "lucide-react";
 
 export default function Admin() {
   const { isAdmin, isManager, loading: authLoading } = useAuth();
@@ -37,6 +37,28 @@ export default function Admin() {
           </p>
         </div>
       </div>
+
+      {/* Atalho para roster */}
+      {isAdmin && (
+        <Card>
+          <CardContent className="flex items-center justify-between pt-5 pb-4">
+            <div>
+              <p className="text-sm font-semibold text-foreground">
+                Roster institucional
+              </p>
+              <p className="text-sm text-muted-foreground">
+                Editar servidores, equipes, presencial e status
+              </p>
+            </div>
+            <Button asChild size="sm">
+              <Link to="/admin/servidores">
+                Gerenciar servidores
+                <ArrowRight className="ml-1 h-4 w-4" />
+              </Link>
+            </Button>
+          </CardContent>
+        </Card>
+      )}
 
       {/* Resumo */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">

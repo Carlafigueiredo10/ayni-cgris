@@ -18,6 +18,7 @@ import Agenda from "./pages/agenda";
 import Equipe from "./pages/Equipe";
 import PGD from "./pages/PGD";
 import Admin from "./pages/Admin";
+import AdminServidores from "./pages/AdminServidores";
 import Relatorios from "./pages/Relatorios";
 
 const queryClient = new QueryClient();
@@ -61,6 +62,7 @@ const App = () => (
                 <Route path="/agenda" element={<Agenda />} />
                 <Route path="/relatorios" element={<Relatorios />} />
                 <Route path="/admin" element={<Admin />} />
+                <Route path="/admin/servidores" element={<AdminServidores />} />
               </Route>
             </Route>
 
