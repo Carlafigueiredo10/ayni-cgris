@@ -18,7 +18,7 @@ export default function Equipe() {
     { nome: "ANDRE CAMBUY AVILA", siape: "1744812", coordenacao: "", presencial: "", email: "", sei: "" },
     { nome: "AUDI PEDRO DE SOUZA", siape: "1109788", coordenacao: "", presencial: "", email: "", sei: "" },
     { nome: "CAMILA ADRIELE CARVALHO BRANCO DE OLIVEIRA SANCHES", siape: "1638009", coordenacao: "", presencial: "", email: "", sei: "" },
-    { nome: "CARLA CRISTINE GONCALVES SOARES FIGUEIREDO", siape: "1759798", coordenacao: "Coordenação CGRIS", presencial: "Sim", email: "carla.figueiredo@cgris.gov.br", sei: "1234567" },
+    { nome: "CARLA CRISTINE GONCALVES SOARES FIGUEIREDO", siape: "1759798", coordenacao: "Coordenação CGRIS", presencial: "Sim", email: "carla.figueiredo@gestao.gov.br", sei: "1234567" },
     { nome: "CARLOS ALBERTO FERNANDES DE ALENCAR", siape: "66622", coordenacao: "", presencial: "", email: "", sei: "" },
     { nome: "CARLOS ALBERTO MENEZES DA COSTA", siape: "3376959", coordenacao: "", presencial: "", email: "", sei: "" },
     { nome: "CAROLINE CORREA MACHADO", siape: "3744691", coordenacao: "", presencial: "", email: "", sei: "" },
