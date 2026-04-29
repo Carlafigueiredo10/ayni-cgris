@@ -1,7 +1,12 @@
 import { useState, useEffect, useMemo, useCallback } from "react";
 import { supabase } from "@/lib/supabase";
 import { useAuth } from "@/contexts/AuthContext";
-import type { Registro, RegistroDB, ReincidenciaResult } from "@/types/registro";
+import type {
+  Registro,
+  RegistroDB,
+  ReincidenciaResult,
+  CpfHistoryResult,
+} from "@/types/registro";
 import { toast } from "sonner";
 
 function dbToRegistro(r: RegistroDB): Registro {
@@ -18,6 +23,22 @@ function dbToRegistro(r: RegistroDB): Registro {
     tipoNatureza: r.tipo_natureza ?? undefined,
     tipoProcesso: r.tipo_processo ?? undefined,
     tipoControle: r.tipo_controle ?? undefined,
+    tipoAto: r.tipo_ato ?? undefined,
+    subtipoAto: r.subtipo_ato ?? undefined,
+    cpf: r.cpf ?? undefined,
+    classificacao: r.classificacao ?? undefined,
+    acordaoTcuTipo: r.acordao_tcu_tipo ?? undefined,
+    assuntoJudicial: r.assunto_judicial ?? undefined,
+    assuntoJudicialOutros: r.assunto_judicial_outros ?? undefined,
+    multa: r.multa ?? false,
+    multaDestinatario: r.multa_destinatario ?? undefined,
+    multaPeriodicidade: r.multa_periodicidade ?? undefined,
+    multaFaixa: r.multa_faixa ?? undefined,
+    encaminhadoPara: r.encaminhado_para ?? undefined,
+    encaminhadoParaOutros: r.encaminhado_para_outros ?? undefined,
+    trilha: r.trilha ?? undefined,
+    acaoColetivaFaixa: r.acao_coletiva_faixa ?? undefined,
+    loteIndiciosFaixa: r.lote_indicios_faixa ?? undefined,
     motivoTempo: r.motivo_tempo ?? undefined,
     numPaginas: r.num_paginas ?? undefined,
     assunto: r.assunto ?? undefined,
@@ -71,6 +92,21 @@ export function useRegistros() {
     []
   );
 
+  const checkCpfHistory = useCallback(
+    async (cpf: string): Promise<CpfHistoryResult | null> => {
+      if (!cpf || cpf.length === 0) return null;
+      const { data, error } = await supabase.rpc("check_cpf_history", {
+        p_cpf: cpf,
+      });
+      if (error) {
+        console.error("Erro ao verificar historico de CPF:", error);
+        return null;
+      }
+      return data?.[0] ?? null;
+    },
+    []
+  );
+
   const addRegistro = useCallback(
     async (
       novo: Registro,
@@ -91,6 +127,22 @@ export function useRegistros() {
         tipo_natureza: novo.tipoNatureza,
         tipo_processo: novo.tipoProcesso,
         tipo_controle: novo.tipoControle,
+        tipo_ato: novo.tipoAto,
+        subtipo_ato: novo.subtipoAto,
+        cpf: novo.cpf,
+        classificacao: novo.classificacao,
+        acordao_tcu_tipo: novo.acordaoTcuTipo,
+        assunto_judicial: novo.assuntoJudicial,
+        assunto_judicial_outros: novo.assuntoJudicialOutros,
+        multa: novo.multa ?? false,
+        multa_destinatario: novo.multaDestinatario,
+        multa_periodicidade: novo.multaPeriodicidade,
+        multa_faixa: novo.multaFaixa,
+        encaminhado_para: novo.encaminhadoPara,
+        encaminhado_para_outros: novo.encaminhadoParaOutros,
+        trilha: novo.trilha,
+        acao_coletiva_faixa: novo.acaoColetivaFaixa,
+        lote_indicios_faixa: novo.loteIndiciosFaixa,
         motivo_tempo: novo.motivoTempo,
         num_paginas: novo.numPaginas,
         assunto: novo.assunto,
@@ -125,6 +177,7 @@ export function useRegistros() {
     stats,
     fetchRegistros,
     checkReincidence,
+    checkCpfHistory,
     addRegistro,
   };
 }

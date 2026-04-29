@@ -4,16 +4,28 @@ import { TrendingUp } from "lucide-react";
 import { useRegistros } from "@/hooks/use-registros";
 import type { Registro, ReincidenciaResult } from "@/types/registro";
 import KpiGrid from "@/components/productivity/KpiGrid";
+import CoordinationKpis from "@/components/productivity/CoordinationKpis";
+import PontosKpi from "@/components/productivity/PontosKpi";
 import ProgressoAcumuladoChart from "@/components/productivity/ProgressoAcumuladoChart";
 import MetaVsRealizadoChart from "@/components/productivity/MetaVsRealizadoChart";
-import Tendencia from "@/components/productivity/Tendencia";
 import RegistroForm from "@/components/productivity/RegistroForm";
 import RelatorioTable from "@/components/productivity/RelatorioTable";
 import ConsolidadoTable from "@/components/productivity/ConsolidadoTable";
 import ReincidenciaModal from "@/components/productivity/ReincidenciaModal";
+import { useCoordinationData } from "@/hooks/use-coordination-data";
+import { useMyScore } from "@/hooks/use-my-score";
 
 const Productivity = () => {
-  const { registros, stats, checkReincidence, addRegistro } = useRegistros();
+  const { registros, stats, checkReincidence, checkCpfHistory, addRegistro } =
+    useRegistros();
+  const { coordinationKpis, loading: coordLoading } = useCoordinationData();
+  const {
+    total: pontosTotal,
+    rows: scoreRows,
+    byRegistroId: scoreById,
+    loading: scoreLoading,
+    refresh: refreshScore,
+  } = useMyScore();
 
   const [pendingRegistro, setPendingRegistro] = useState<Registro | null>(null);
   const [reincidenciaResult, setReincidenciaResult] =
@@ -34,6 +46,7 @@ const Productivity = () => {
     }
 
     await addRegistro(novo);
+    await refreshScore();
     setSubmitting(false);
   };
 
@@ -48,6 +61,7 @@ const Productivity = () => {
       reincidenciaResult.reincidence_type,
       respostas
     );
+    await refreshScore();
     setPendingRegistro(null);
     setReincidenciaResult(null);
     setSubmitting(false);
@@ -81,14 +95,26 @@ const Productivity = () => {
         media={stats.media}
       />
 
-      <Tendencia total={stats.total} />
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+        <PontosKpi
+          total={pontosTotal}
+          registrosPontuados={scoreRows.length}
+          loading={scoreLoading}
+        />
+      </div>
+
+      <CoordinationKpis kpis={coordinationKpis} loading={coordLoading} />
 
       <Card>
         <CardHeader className="pb-0">
           <CardTitle className="text-base">Produtividade Individual</CardTitle>
         </CardHeader>
         <CardContent className="pt-4">
-          <RegistroForm onSubmit={handleSubmit} submitting={submitting} />
+          <RegistroForm
+            onSubmit={handleSubmit}
+            submitting={submitting}
+            onCpfCheck={checkCpfHistory}
+          />
         </CardContent>
       </Card>
 
@@ -97,7 +123,7 @@ const Productivity = () => {
         <MetaVsRealizadoChart total={stats.total} />
       </div>
 
-      <RelatorioTable registros={registros} />
+      <RelatorioTable registros={registros} scoreById={scoreById} />
       <ConsolidadoTable registros={registros} />
 
       <ReincidenciaModal

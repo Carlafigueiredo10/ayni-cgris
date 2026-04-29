@@ -13,9 +13,19 @@ type TeamSummaryRow = {
   total_minutos: number;
 };
 
+export type CoordinationKpisRow = {
+  mes: string;
+  entrada_processos: number;
+  saida_processos: number;
+  servidores_coordenacao: number;
+  media_concluidos_servidor: number | null;
+};
+
 export function useCoordinationData() {
   const { hasTeam } = useAuth();
   const [teamSummary, setTeamSummary] = useState<TeamSummaryRow | null>(null);
+  const [coordinationKpis, setCoordinationKpis] =
+    useState<CoordinationKpisRow | null>(null);
   const [personalStats, setPersonalStats] = useState({
     total: 0,
     totalMinutos: 0,
@@ -37,6 +47,16 @@ export function useCoordinationData() {
 
     if (!error && data && data.length > 0) {
       setTeamSummary(data[0] as TeamSummaryRow);
+    }
+  }, [hasTeam, month]);
+
+  const fetchCoordinationKpis = useCallback(async () => {
+    if (!hasTeam) return;
+    const { data, error } = await supabase.rpc("get_coordination_kpis", {
+      p_month: month,
+    });
+    if (!error && data && data.length > 0) {
+      setCoordinationKpis(data[0] as CoordinationKpisRow);
     }
   }, [hasTeam, month]);
 
@@ -63,11 +83,15 @@ export function useCoordinationData() {
   useEffect(() => {
     const load = async () => {
       setLoading(true);
-      await Promise.all([fetchTeamSummary(), fetchPersonalStats()]);
+      await Promise.all([
+        fetchTeamSummary(),
+        fetchCoordinationKpis(),
+        fetchPersonalStats(),
+      ]);
       setLoading(false);
     };
     load();
-  }, [fetchTeamSummary, fetchPersonalStats]);
+  }, [fetchTeamSummary, fetchCoordinationKpis, fetchPersonalStats]);
 
-  return { teamSummary, personalStats, loading };
+  return { teamSummary, coordinationKpis, personalStats, loading };
 }

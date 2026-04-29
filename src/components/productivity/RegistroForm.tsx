@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -7,8 +7,21 @@ import {
   CollapsibleContent,
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
-import { ChevronDown, Plus } from "lucide-react";
-import type { Registro } from "@/types/registro";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+import { ChevronDown, Plus, HelpCircle } from "lucide-react";
+import type { Registro, CpfHistoryResult } from "@/types/registro";
+import { formatCpf, isValidCpf, onlyDigits } from "@/lib/cpf";
+import {
+  getAssuntosByTipo,
+  FAIXAS_MULTA,
+  AREAS_ENCAMINHAMENTO,
+  FAIXAS_ACAO_COLETIVA,
+  FAIXAS_LOTE_INDICIOS,
+} from "@/lib/judicial-options";
 
 const EMPTY: Registro = {
   data: "",
@@ -20,6 +33,22 @@ const EMPTY: Registro = {
   tipoNatureza: "",
   tipoProcesso: "",
   tipoControle: "",
+  tipoAto: "",
+  subtipoAto: "",
+  cpf: "",
+  classificacao: "",
+  acordaoTcuTipo: "",
+  assuntoJudicial: "",
+  assuntoJudicialOutros: "",
+  multa: false,
+  multaDestinatario: "",
+  multaPeriodicidade: "",
+  multaFaixa: "",
+  encaminhadoPara: "",
+  encaminhadoParaOutros: "",
+  trilha: "",
+  acaoColetivaFaixa: "",
+  loteIndiciosFaixa: "",
   motivoTempo: "",
   numPaginas: "",
   assunto: "",
@@ -27,19 +56,79 @@ const EMPTY: Registro = {
   outroMotivo: "",
 };
 
+const SUBTIPOS_ATO: Record<string, { v: string; l: string }[]> = {
+  pensao: [
+    { v: "nova_concessao", l: "Nova concessão" },
+    { v: "revisao", l: "Revisão" },
+    { v: "diligencia", l: "Diligência" },
+    { v: "devolucao", l: "Devolução" },
+    { v: "judicial", l: "Judicial" },
+  ],
+  aposentadoria: [
+    { v: "nova_concessao", l: "Nova concessão" },
+    { v: "revisao", l: "Revisão" },
+    { v: "diligencia", l: "Diligência" },
+    { v: "devolucao", l: "Devolução" },
+    { v: "judicial", l: "Judicial" },
+  ],
+  administrativo: [
+    { v: "levantamento_indicador", l: "Levantamento de indicador" },
+    { v: "busca_processo", l: "Busca de processo" },
+    { v: "triagem_planilha", l: "Triagem de planilha" },
+    { v: "anexo_diligencia", l: "Anexo de diligência" },
+  ],
+};
+
+const ENTREGAS = [
+  "Nota informativa",
+  "Nota Tecnica",
+  "Oficio",
+  "Despacho",
+  "Memoria de calculo",
+  "Ajuste no sistema",
+];
+
 type Props = {
   onSubmit: (registro: Registro) => void;
   submitting?: boolean;
+  onCpfCheck?: (cpf: string) => Promise<CpfHistoryResult | null>;
 };
 
-export default function RegistroForm({ onSubmit, submitting }: Props) {
+export default function RegistroForm({
+  onSubmit,
+  submitting,
+  onCpfCheck,
+}: Props) {
   const [open, setOpen] = useState(true);
   const [novo, setNovo] = useState<Registro>({ ...EMPTY });
+  const [cpfHistory, setCpfHistory] = useState<CpfHistoryResult | null>(null);
+
+  const cpfDigits = onlyDigits(novo.cpf ?? "");
+  const cpfTouched = cpfDigits.length > 0;
+  const cpfValid = cpfDigits.length === 0 || isValidCpf(cpfDigits);
+
+  useEffect(() => {
+    if (!onCpfCheck || cpfDigits.length !== 11 || !cpfValid) {
+      setCpfHistory(null);
+      return;
+    }
+    let cancelled = false;
+    const t = setTimeout(async () => {
+      const r = await onCpfCheck(cpfDigits);
+      if (!cancelled) setCpfHistory(r);
+    }, 300);
+    return () => {
+      cancelled = true;
+      clearTimeout(t);
+    };
+  }, [cpfDigits, cpfValid, onCpfCheck]);
 
   const handleSubmit = () => {
     if (!novo.data || !novo.processo || !novo.minutos) return;
-    onSubmit(novo);
+    if (cpfTouched && !cpfValid) return;
+    onSubmit({ ...novo, cpf: cpfDigits || undefined });
     setNovo({ ...EMPTY });
+    setCpfHistory(null);
   };
 
   return (
@@ -73,6 +162,17 @@ export default function RegistroForm({ onSubmit, submitting }: Props) {
                   tipoNatureza: e.target.value,
                   tipoProcesso: "",
                   tipoControle: "",
+                  tipoAto: "",
+                  subtipoAto: "",
+                  classificacao: "",
+                  acordaoTcuTipo: "",
+                  assuntoJudicial: "",
+                  assuntoJudicialOutros: "",
+                  multa: false,
+                  multaDestinatario: "",
+                  multaPeriodicidade: "",
+                  multaFaixa: "",
+                  trilha: "",
                 })
               }
               className="w-full border rounded-md h-10 px-3 bg-background text-sm"
@@ -80,6 +180,7 @@ export default function RegistroForm({ onSubmit, submitting }: Props) {
               <option value="">Selecione</option>
               <option value="judicial">Judicial</option>
               <option value="controle">Controle</option>
+              <option value="atos">Atos de pessoal</option>
             </select>
           </div>
 
@@ -88,29 +189,88 @@ export default function RegistroForm({ onSubmit, submitting }: Props) {
               <Label>Tipo de processo</Label>
               <select
                 value={novo.tipoProcesso}
-                onChange={(e) => setNovo({ ...novo, tipoProcesso: e.target.value })}
+                onChange={(e) =>
+                  setNovo({
+                    ...novo,
+                    tipoProcesso: e.target.value,
+                    assuntoJudicial: "",
+                    assuntoJudicialOutros: "",
+                  })
+                }
                 className="w-full border rounded-md h-10 px-3 bg-background text-sm"
               >
                 <option value="">Selecione</option>
                 <option value="subsidio">Subsidio</option>
                 <option value="cumprimento">Cumprimento</option>
+                <option value="administrativo">Administrativo</option>
               </select>
             </div>
           )}
 
           {novo.tipoNatureza === "controle" && (
-            <div>
-              <Label>Indicio ou processo</Label>
-              <select
-                value={novo.tipoControle}
-                onChange={(e) => setNovo({ ...novo, tipoControle: e.target.value })}
-                className="w-full border rounded-md h-10 px-3 bg-background text-sm"
-              >
-                <option value="">Selecione</option>
-                <option value="indicio">Indicio</option>
-                <option value="processo">Processo</option>
-              </select>
-            </div>
+            <>
+              <div>
+                <Label>Indicio ou processo</Label>
+                <select
+                  value={novo.tipoControle}
+                  onChange={(e) => setNovo({ ...novo, tipoControle: e.target.value })}
+                  className="w-full border rounded-md h-10 px-3 bg-background text-sm"
+                >
+                  <option value="">Selecione</option>
+                  <option value="indicio">Indicio</option>
+                  <option value="processo">Processo</option>
+                </select>
+              </div>
+              <div>
+                <Label>Trilha</Label>
+                <Input
+                  list="trilhas-sugestoes"
+                  placeholder="Nome da trilha"
+                  value={novo.trilha || ""}
+                  onChange={(e) => setNovo({ ...novo, trilha: e.target.value })}
+                />
+                <datalist id="trilhas-sugestoes" />
+              </div>
+            </>
+          )}
+
+          {novo.tipoNatureza === "atos" && (
+            <>
+              <div>
+                <Label>Tipo de ato</Label>
+                <select
+                  value={novo.tipoAto}
+                  onChange={(e) =>
+                    setNovo({ ...novo, tipoAto: e.target.value, subtipoAto: "" })
+                  }
+                  className="w-full border rounded-md h-10 px-3 bg-background text-sm"
+                >
+                  <option value="">Selecione</option>
+                  <option value="pensao">Pensão</option>
+                  <option value="aposentadoria">Aposentadoria</option>
+                  <option value="administrativo">Administrativo</option>
+                </select>
+              </div>
+              {novo.tipoAto && (
+                <div>
+                  <Label>Sub-tipo</Label>
+                  <select
+                    value={novo.subtipoAto}
+                    onChange={(e) =>
+                      setNovo({ ...novo, subtipoAto: e.target.value })
+                    }
+                    className="w-full border rounded-md h-10 px-3 bg-background text-sm"
+                  >
+                    <option value="">Selecione</option>
+                    {SUBTIPOS_ATO[novo.tipoAto]?.map((s) => (
+                      <option key={s.v} value={s.v}>
+                        {s.l}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              )}
+            </>
           )}
 
           <div className="sm:col-span-2">
@@ -122,13 +282,49 @@ export default function RegistroForm({ onSubmit, submitting }: Props) {
             />
           </div>
 
+          <div className="sm:col-span-2">
+            <Label>CPF (opcional)</Label>
+            <Input
+              inputMode="numeric"
+              placeholder="000.000.000-00"
+              value={formatCpf(novo.cpf ?? "")}
+              onChange={(e) => setNovo({ ...novo, cpf: e.target.value })}
+              aria-invalid={cpfTouched && !cpfValid}
+              className={cpfTouched && !cpfValid ? "border-destructive" : ""}
+            />
+            {cpfTouched && !cpfValid && (
+              <p className="text-xs text-destructive mt-1">CPF inválido</p>
+            )}
+            {cpfHistory && cpfHistory.total_registros > 0 && (
+              <p className="text-xs text-amber-600 mt-1">
+                ⚠ Este CPF já tem {cpfHistory.total_registros} registro
+                {cpfHistory.total_registros === 1 ? "" : "s"} na sua equipe
+                {cpfHistory.processos_distintos > 1 &&
+                  ` em ${cpfHistory.processos_distintos} processos distintos`}
+                {cpfHistory.ultimo_processo && (
+                  <>
+                    . Último: <strong>{cpfHistory.ultimo_processo}</strong>
+                    {cpfHistory.ultimo_status && ` (${cpfHistory.ultimo_status})`}
+                  </>
+                )}
+              </p>
+            )}
+          </div>
+
           <div>
             <Label>Status</Label>
             <select
               value={novo.status}
-              onChange={(e) =>
-                setNovo({ ...novo, status: e.target.value as Registro["status"] })
-              }
+              onChange={(e) => {
+                const v = e.target.value as Registro["status"];
+                setNovo({
+                  ...novo,
+                  status: v,
+                  encaminhadoPara: v === "Encaminhado" ? novo.encaminhadoPara : "",
+                  encaminhadoParaOutros:
+                    v === "Encaminhado" ? novo.encaminhadoParaOutros : "",
+                });
+              }}
               className="w-full border rounded-md h-10 px-3 bg-background text-sm"
             >
               <option>Concluido</option>
@@ -160,6 +356,8 @@ export default function RegistroForm({ onSubmit, submitting }: Props) {
                     { v: "extenso", l: "Muito extenso" },
                     { v: "complexo", l: "Complexo" },
                     { v: "familiaridade", l: "Sem familiaridade" },
+                    { v: "acao_coletiva", l: "Ação coletiva" },
+                    { v: "lote_indicios", l: "Análise em lote de indícios" },
                     { v: "outro", l: "Outro" },
                   ].map(({ v, l }) => (
                     <label key={v} className="flex items-center gap-2">
@@ -210,6 +408,50 @@ export default function RegistroForm({ onSubmit, submitting }: Props) {
                     />
                   </div>
                 )}
+                {novo.motivoTempo === "acao_coletiva" && (
+                  <div className="ml-6">
+                    <Label className="text-xs">Faixa de quantidade</Label>
+                    <select
+                      value={novo.acaoColetivaFaixa}
+                      onChange={(e) =>
+                        setNovo({
+                          ...novo,
+                          acaoColetivaFaixa: e.target.value,
+                        })
+                      }
+                      className="w-full border rounded-md h-10 px-3 bg-background text-sm"
+                    >
+                      <option value="">Selecione</option>
+                      {FAIXAS_ACAO_COLETIVA.map((f) => (
+                        <option key={f.v} value={f.v}>
+                          {f.l}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                )}
+                {novo.motivoTempo === "lote_indicios" && (
+                  <div className="ml-6">
+                    <Label className="text-xs">Faixa de quantidade</Label>
+                    <select
+                      value={novo.loteIndiciosFaixa}
+                      onChange={(e) =>
+                        setNovo({
+                          ...novo,
+                          loteIndiciosFaixa: e.target.value,
+                        })
+                      }
+                      className="w-full border rounded-md h-10 px-3 bg-background text-sm"
+                    >
+                      <option value="">Selecione</option>
+                      {FAIXAS_LOTE_INDICIOS.map((f) => (
+                        <option key={f.v} value={f.v}>
+                          {f.l}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                )}
                 {novo.motivoTempo === "outro" && (
                   <div className="ml-6">
                     <Label className="text-xs">Descreva</Label>
@@ -225,33 +467,257 @@ export default function RegistroForm({ onSubmit, submitting }: Props) {
             )}
           </div>
 
+          {novo.status === "Encaminhado" && (
+            <div className="sm:col-span-4 grid gap-4 sm:grid-cols-2 p-4 border rounded-md bg-muted/20">
+              <div>
+                <Label>Encaminhado para</Label>
+                <select
+                  value={novo.encaminhadoPara}
+                  onChange={(e) =>
+                    setNovo({
+                      ...novo,
+                      encaminhadoPara: e.target.value,
+                      encaminhadoParaOutros:
+                        e.target.value === "outros"
+                          ? novo.encaminhadoParaOutros
+                          : "",
+                    })
+                  }
+                  className="w-full border rounded-md h-10 px-3 bg-background text-sm"
+                >
+                  <option value="">Selecione</option>
+                  {AREAS_ENCAMINHAMENTO.map((a) => (
+                    <option key={a.v} value={a.v}>
+                      {a.l}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              {novo.encaminhadoPara === "outros" && (
+                <div>
+                  <Label>Descreva a área</Label>
+                  <Input
+                    value={novo.encaminhadoParaOutros || ""}
+                    onChange={(e) =>
+                      setNovo({
+                        ...novo,
+                        encaminhadoParaOutros: e.target.value,
+                      })
+                    }
+                  />
+                </div>
+              )}
+            </div>
+          )}
+
+          {novo.tipoNatureza === "judicial" && (
+            <div className="sm:col-span-4 space-y-4 p-4 border rounded-md bg-muted/20">
+              <h4 className="text-sm font-semibold">Detalhes judiciais</h4>
+
+              <div className="grid gap-4 sm:grid-cols-3">
+                <div>
+                  <Label>Classificação</Label>
+                  <select
+                    value={novo.classificacao}
+                    onChange={(e) =>
+                      setNovo({
+                        ...novo,
+                        classificacao: e.target.value,
+                        acordaoTcuTipo: "",
+                      })
+                    }
+                    className="w-full border rounded-md h-10 px-3 bg-background text-sm"
+                  >
+                    <option value="">Selecione</option>
+                    <option value="acordao_tcu">Acórdão (TCU)</option>
+                    <option value="diligencia">Diligência</option>
+                    <option value="indicio">Indício</option>
+                  </select>
+                </div>
+
+                {novo.classificacao === "acordao_tcu" && (
+                  <div>
+                    <Label>Tipo do Acórdão</Label>
+                    <select
+                      value={novo.acordaoTcuTipo}
+                      onChange={(e) =>
+                        setNovo({ ...novo, acordaoTcuTipo: e.target.value })
+                      }
+                      className="w-full border rounded-md h-10 px-3 bg-background text-sm"
+                    >
+                      <option value="">Selecione</option>
+                      <option value="oitiva">Oitiva</option>
+                      <option value="responsabilizacao">Responsabilização</option>
+                    </select>
+                  </div>
+                )}
+              </div>
+
+              {(novo.tipoProcesso === "subsidio" ||
+                novo.tipoProcesso === "cumprimento") && (
+                <div className="grid gap-4 sm:grid-cols-2">
+                  <div>
+                    <Label>Assunto</Label>
+                    <select
+                      value={novo.assuntoJudicial}
+                      onChange={(e) => {
+                        const v = e.target.value;
+                        if (
+                          v === "outros" &&
+                          !window.confirm(
+                            "Tem certeza que o assunto não está na lista?"
+                          )
+                        ) {
+                          return;
+                        }
+                        setNovo({
+                          ...novo,
+                          assuntoJudicial: v,
+                          assuntoJudicialOutros:
+                            v === "outros" ? novo.assuntoJudicialOutros : "",
+                        });
+                      }}
+                      className="w-full border rounded-md h-10 px-3 bg-background text-sm"
+                    >
+                      <option value="">Selecione</option>
+                      {getAssuntosByTipo(novo.tipoProcesso).map((o) => (
+                        <option key={o.v} value={o.v}>
+                          {o.l}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
+                  {novo.assuntoJudicial === "outros" && (
+                    <div>
+                      <Label>Descreva o assunto</Label>
+                      <Input
+                        value={novo.assuntoJudicialOutros || ""}
+                        onChange={(e) =>
+                          setNovo({
+                            ...novo,
+                            assuntoJudicialOutros: e.target.value,
+                          })
+                        }
+                      />
+                    </div>
+                  )}
+                </div>
+              )}
+
+              <div className="space-y-3">
+                <label className="flex items-center gap-2 text-sm">
+                  <input
+                    type="checkbox"
+                    checked={!!novo.multa}
+                    onChange={(e) =>
+                      setNovo({
+                        ...novo,
+                        multa: e.target.checked,
+                        multaDestinatario: e.target.checked
+                          ? novo.multaDestinatario
+                          : "",
+                        multaPeriodicidade: e.target.checked
+                          ? novo.multaPeriodicidade
+                          : "",
+                        multaFaixa: e.target.checked ? novo.multaFaixa : "",
+                      })
+                    }
+                  />
+                  Houve aplicação de multa
+                </label>
+
+                {novo.multa && (
+                  <div className="grid gap-4 sm:grid-cols-3">
+                    <div>
+                      <Label>Destinatário</Label>
+                      <select
+                        value={novo.multaDestinatario}
+                        onChange={(e) =>
+                          setNovo({ ...novo, multaDestinatario: e.target.value })
+                        }
+                        className="w-full border rounded-md h-10 px-3 bg-background text-sm"
+                      >
+                        <option value="">Selecione</option>
+                        <option value="uniao">União</option>
+                        <option value="pessoal">Pessoal</option>
+                      </select>
+                    </div>
+                    <div>
+                      <Label>Periodicidade</Label>
+                      <select
+                        value={novo.multaPeriodicidade}
+                        onChange={(e) =>
+                          setNovo({
+                            ...novo,
+                            multaPeriodicidade: e.target.value,
+                          })
+                        }
+                        className="w-full border rounded-md h-10 px-3 bg-background text-sm"
+                      >
+                        <option value="">Selecione</option>
+                        <option value="dia">Por dia</option>
+                        <option value="total">Total</option>
+                      </select>
+                    </div>
+                    <div>
+                      <Label>Faixa de valor</Label>
+                      <select
+                        value={novo.multaFaixa}
+                        onChange={(e) =>
+                          setNovo({ ...novo, multaFaixa: e.target.value })
+                        }
+                        className="w-full border rounded-md h-10 px-3 bg-background text-sm"
+                      >
+                        <option value="">Selecione</option>
+                        {FAIXAS_MULTA.map((f) => (
+                          <option key={f.v} value={f.v}>
+                            {f.l}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+
           <div className="sm:col-span-4">
             <Label>Documento ou acao</Label>
             <div className="flex flex-wrap gap-3 mt-1.5">
-              {[
-                "Nota informativa",
-                "Nota Tecnica",
-                "Oficio",
-                "Despacho",
-                "Ajuste no sistema",
-              ].map((doc) => (
-                <label key={doc} className="flex items-center gap-1.5 text-sm">
-                  <input
-                    type="checkbox"
-                    checked={novo.documentoOuAcao?.includes(doc) || false}
-                    onChange={(e) => {
-                      const arr = novo.documentoOuAcao || [];
-                      setNovo({
-                        ...novo,
-                        documentoOuAcao: e.target.checked
-                          ? [...arr, doc]
-                          : arr.filter((d) => d !== doc),
-                      });
-                    }}
-                  />
-                  {doc}
-                </label>
-              ))}
+              {ENTREGAS.map((doc) => {
+                const isAjuste = doc === "Ajuste no sistema";
+                const checkbox = (
+                  <label key={doc} className="flex items-center gap-1.5 text-sm">
+                    <input
+                      type="checkbox"
+                      checked={novo.documentoOuAcao?.includes(doc) || false}
+                      onChange={(e) => {
+                        const arr = novo.documentoOuAcao || [];
+                        setNovo({
+                          ...novo,
+                          documentoOuAcao: e.target.checked
+                            ? [...arr, doc]
+                            : arr.filter((d) => d !== doc),
+                        });
+                      }}
+                    />
+                    {doc}
+                    {isAjuste && (
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <HelpCircle className="h-3.5 w-3.5 text-muted-foreground" />
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          Inclui ajustes via planilha
+                        </TooltipContent>
+                      </Tooltip>
+                    )}
+                  </label>
+                );
+                return checkbox;
+              })}
             </div>
 
             {novo.documentoOuAcao?.includes("Ajuste no sistema") && (
@@ -276,7 +742,13 @@ export default function RegistroForm({ onSubmit, submitting }: Props) {
 
         <Button
           onClick={handleSubmit}
-          disabled={!novo.data || !novo.processo || !novo.minutos || submitting}
+          disabled={
+            !novo.data ||
+            !novo.processo ||
+            !novo.minutos ||
+            (cpfTouched && !cpfValid) ||
+            submitting
+          }
           className="gap-2"
         >
           <Plus className="h-4 w-4" />

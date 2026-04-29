@@ -35,6 +35,7 @@ export default function ReincidenciaModal({
     ? "Reincidencia detectada (mesmo servidor)"
     : "Processo ja analisado por outro servidor";
   const severity = isSelf ? "destructive" : "outline";
+  const wasConcluded = !!result.already_concluded;
 
   const handleConfirm = () => {
     onConfirm({ motivo, acao });
@@ -62,6 +63,22 @@ export default function ReincidenciaModal({
               </>
             )}
           </DialogDescription>
+          {(wasConcluded || result.last_status) && (
+            <div className="mt-2 text-sm space-y-1">
+              {wasConcluded && (
+                <p className="text-destructive font-medium">
+                  ⚠ Este processo ja foi <strong>concluido</strong>{" "}
+                  anteriormente — confirme se realmente precisa ser reaberto.
+                </p>
+              )}
+              {result.last_status && !wasConcluded && (
+                <p className="text-muted-foreground">
+                  Ultimo status registrado:{" "}
+                  <strong>{result.last_status}</strong>
+                </p>
+              )}
+            </div>
+          )}
         </DialogHeader>
 
         <div className="space-y-4 py-2">
