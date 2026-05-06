@@ -21,7 +21,17 @@ import Admin from "./pages/Admin";
 import AdminServidores from "./pages/AdminServidores";
 import Relatorios from "./pages/Relatorios";
 
-const queryClient = new QueryClient();
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      // Refetch quando voltar à aba ou recuperar conexão — evita ver dados velhos
+      refetchOnWindowFocus: true,
+      refetchOnReconnect: true,
+      // Considera "fresco" por 10s para evitar refetch demais
+      staleTime: 10_000,
+    },
+  },
+});
 
 function ProtectedRoute() {
   const { user, loading } = useAuth();

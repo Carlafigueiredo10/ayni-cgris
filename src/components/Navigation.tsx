@@ -1,4 +1,4 @@
-import { useNavigate, useLocation } from "react-router-dom";
+import { useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import {
   Users,
@@ -13,9 +13,8 @@ import {
 import { useAuth } from "@/contexts/AuthContext";
 
 const Navigation = () => {
-  const navigate = useNavigate();
   const location = useLocation();
-  const { isAdmin, isManager, signOut } = useAuth();
+  const { isAdmin, isManagerCgris, isManager, signOut } = useAuth();
 
   const items = [
     { label: "PGD", icon: FileText, href: "/pgd" },
@@ -25,17 +24,16 @@ const Navigation = () => {
     { label: "Equipe", icon: Users, href: "/equipe" },
   ];
 
-  if (isManager || isAdmin) {
+  if (isManager || isManagerCgris || isAdmin) {
     items.push({ label: "Relatorios", icon: BarChart3, href: "/relatorios" });
   }
 
-  if (isAdmin) {
+  if (isAdmin || isManagerCgris) {
     items.push({ label: "Admin", icon: Settings, href: "/admin" });
   }
 
   const handleSignOut = async () => {
     await signOut();
-    navigate("/");
   };
 
   return (

@@ -1,11 +1,11 @@
 import { useAuth } from "@/contexts/AuthContext";
 
 export default function TeamGuard({ children }: { children: React.ReactNode }) {
-  const { isAdmin, hasTeam, loading } = useAuth();
+  const { isAdmin, isManagerCgris, hasTeam, loading } = useAuth();
 
   if (loading) return null;
 
-  if (isAdmin) return <>{children}</>;
+  if (isAdmin || isManagerCgris) return <>{children}</>;
 
   if (!hasTeam) {
     return (

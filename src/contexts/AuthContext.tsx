@@ -7,7 +7,8 @@ export type Profile = {
   display_name: string | null;
   email: string | null;
   team_id: string | null;
-  role: "admin_global" | "manager_team" | "member";
+  role: "admin_global" | "manager_cgris" | "manager_team" | "member";
+  is_active: boolean;
 };
 
 type AuthContextType = {
@@ -15,6 +16,7 @@ type AuthContextType = {
   profile: Profile | null;
   loading: boolean;
   isAdmin: boolean;
+  isManagerCgris: boolean;
   isManager: boolean;
   hasTeam: boolean;
   signOut: () => Promise<void>;
@@ -25,12 +27,58 @@ const AuthContext = createContext<AuthContextType>({
   profile: null,
   loading: true,
   isAdmin: false,
+  isManagerCgris: false,
   isManager: false,
   hasTeam: false,
   signOut: async () => {},
 });
 
 export const useAuth = () => useContext(AuthContext);
+
+// Carrega o profile com timeout duro — nunca pendura.
+async function loadProfileSafe(userId: string): Promise<Profile | null> {
+  const TIMEOUT_MS = 4000;
+
+  const fetchProfile = async (): Promise<Profile | null> => {
+    try {
+      const { data: rpcData, error: rpcErr } = await supabase.rpc("get_my_profile");
+      if (!rpcErr && rpcData && rpcData.length > 0) {
+        return rpcData[0] as Profile;
+      }
+      const { data, error } = await supabase
+        .from("profiles")
+        .select("id, display_name, email, team_id, role, is_active")
+        .eq("id", userId)
+        .single();
+      if (error || !data) return null;
+      return data as Profile;
+    } catch (err) {
+      console.error("[Auth] loadProfile erro:", err);
+      return null;
+    }
+  };
+
+  return Promise.race([
+    fetchProfile(),
+    new Promise<null>((resolve) =>
+      setTimeout(() => {
+        console.warn("[Auth] loadProfile timeout");
+        resolve(null);
+      }, TIMEOUT_MS)
+    ),
+  ]);
+}
+
+function clearSupabaseStorage() {
+  try {
+    Object.keys(localStorage)
+      .filter((k) => k.startsWith("sb-"))
+      .forEach((k) => localStorage.removeItem(k));
+    sessionStorage.clear();
+  } catch {
+    /* noop */
+  }
+}
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
@@ -40,81 +88,53 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   useEffect(() => {
     let mounted = true;
 
-    // Safety: se nada resolver em 6s, desbloqueia a UI
-    const timeout = setTimeout(() => {
+    // Fallback extremo: se bootstrap não terminar em 10s, registra erro e libera UI.
+    const fallback = setTimeout(() => {
       if (mounted && loading) {
-        console.warn("[Auth] Timeout — forçando loading=false");
+        console.error("[Auth] bootstrap timeout — sem sessão resolvida em 10s");
         setLoading(false);
       }
-    }, 6000);
+    }, 10000);
 
-    async function loadProfile(userId: string) {
+    async function bootstrap() {
       try {
-        // Tenta RPC primeiro (SECURITY DEFINER, bypassa RLS)
-        const { data: rpcData, error: rpcErr } = await supabase.rpc("get_my_profile");
+        const { data: { session }, error } = await supabase.auth.getSession();
+        if (error) console.error("[Auth] getSession erro:", error);
 
         if (!mounted) return;
 
-        if (!rpcErr && rpcData && rpcData.length > 0) {
-          setProfile(rpcData[0] as Profile);
-          return;
-        }
+        const u = session?.user ?? null;
+        setUser(u);
 
-        // Fallback: query direta (policy simples: id = auth.uid())
-        const { data, error } = await supabase
-          .from("profiles")
-          .select("id, display_name, email, team_id, role")
-          .eq("id", userId)
-          .single();
-
-        if (!mounted) return;
-
-        if (error || !data) {
-          console.error("[Auth] Perfil nao encontrado:", error);
-          setProfile(null);
-          return;
-        }
-        setProfile(data as Profile);
-      } catch (err) {
-        console.error("[Auth] Erro inesperado:", err);
-        if (mounted) setProfile(null);
-      }
-    }
-
-    async function init() {
-      try {
-        const { data: { session } } = await supabase.auth.getSession();
-
-        if (!mounted) return;
-
-        const currentUser = session?.user ?? null;
-        setUser(currentUser);
-
-        if (currentUser) {
-          await loadProfile(currentUser.id);
+        if (u) {
+          const p = await loadProfileSafe(u.id);
+          if (mounted) setProfile(p);
         }
       } catch (err) {
-        console.error("[Auth] getSession falhou:", err);
+        console.error("[Auth] bootstrap exceção:", err);
       } finally {
         if (mounted) {
           setLoading(false);
-          clearTimeout(timeout);
+          clearTimeout(fallback);
         }
       }
     }
 
-    init();
+    bootstrap();
 
+    // Listener apenas sincroniza mudanças futuras. Bootstrap já tratou estado inicial.
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange(async (_event, session) => {
+    } = supabase.auth.onAuthStateChange(async (event, session) => {
       if (!mounted) return;
+      if (event === "INITIAL_SESSION") return;
 
-      const currentUser = session?.user ?? null;
-      setUser(currentUser);
+      const u = session?.user ?? null;
+      setUser(u);
 
-      if (currentUser) {
-        await loadProfile(currentUser.id);
+      if (u) {
+        const p = await loadProfileSafe(u.id);
+        if (mounted) setProfile(p);
       } else {
         setProfile(null);
       }
@@ -122,24 +142,42 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
     return () => {
       mounted = false;
-      clearTimeout(timeout);
+      clearTimeout(fallback);
       subscription.unsubscribe();
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const signOut = async () => {
-    await supabase.auth.signOut();
-    setUser(null);
-    setProfile(null);
+    try {
+      await supabase.auth.signOut({ scope: "local" });
+    } catch (err) {
+      console.error("[Auth] signOut error:", err);
+    } finally {
+      clearSupabaseStorage();
+      setUser(null);
+      setProfile(null);
+      window.location.replace("/login");
+    }
   };
 
   const isAdmin = profile?.role === "admin_global";
+  const isManagerCgris = profile?.role === "manager_cgris";
   const isManager = profile?.role === "manager_team";
   const hasTeam = profile?.team_id != null;
 
   return (
     <AuthContext.Provider
-      value={{ user, profile, loading, isAdmin, isManager, hasTeam, signOut }}
+      value={{
+        user,
+        profile,
+        loading,
+        isAdmin,
+        isManagerCgris,
+        isManager,
+        hasTeam,
+        signOut,
+      }}
     >
       {children}
     </AuthContext.Provider>

@@ -3,5 +3,11 @@ node_modules/
 bun.lockb
 node_modules
 
+# Build artifacts
+dist/
+
+# Local Claude Code session/settings
+.claude/
+
 # Dados de seed (LGPD — nao commitar dados reais de servidores)
 servidores_seed.csv
