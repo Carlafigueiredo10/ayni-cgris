@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Mail, Lock, User } from "lucide-react";
+import { Mail, Lock, User, Users } from "lucide-react";
 import { toast } from "sonner";
 
 type Mode = "signin" | "signup" | "forgot";
@@ -19,8 +19,14 @@ const LoginCard = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [nome, setNome] = useState("");
+  const [teamCode, setTeamCode] = useState("");
 
   const ALLOWED_DOMAIN = "@gestao.gov.br";
+
+  const TEAM_OPTIONS = [
+    { code: "cocon", label: "COCON — Coordenação de Controle" },
+    { code: "codej", label: "CODEJ — Coordenação de Demandas Judiciais" },
+  ];
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -32,16 +38,21 @@ const LoginCard = () => {
         setLoading(false);
         return;
       }
+      if (!teamCode) {
+        toast.error("Selecione sua equipe");
+        setLoading(false);
+        return;
+      }
 
       const { error } = await supabase.auth.signUp({
         email,
         password,
-        options: { data: { nome } },
+        options: { data: { nome, team_code: teamCode } },
       });
       if (error) {
         toast.error("Erro ao cadastrar: " + error.message);
       } else {
-        toast.success("Cadastro realizado! Verifique seu email.");
+        toast.success("Cadastro realizado!");
         setMode("signin");
       }
     } else if (mode === "signin") {
@@ -93,20 +104,43 @@ const LoginCard = () => {
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
             {mode === "signup" && (
-              <div className="space-y-2">
-                <Label htmlFor="nome">Nome</Label>
-                <div className="relative">
-                  <User className="absolute left-3 top-3 h-5 w-5 text-muted-foreground" />
-                  <Input
-                    id="nome"
-                    placeholder="Seu nome"
-                    value={nome}
-                    onChange={(e) => setNome(e.target.value)}
-                    className="pl-10 h-12 border-2"
-                    required
-                  />
+              <>
+                <div className="space-y-2">
+                  <Label htmlFor="nome">Nome</Label>
+                  <div className="relative">
+                    <User className="absolute left-3 top-3 h-5 w-5 text-muted-foreground" />
+                    <Input
+                      id="nome"
+                      placeholder="Seu nome"
+                      value={nome}
+                      onChange={(e) => setNome(e.target.value)}
+                      className="pl-10 h-12 border-2"
+                      required
+                    />
+                  </div>
                 </div>
-              </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="team">Equipe</Label>
+                  <div className="relative">
+                    <Users className="absolute left-3 top-3 h-5 w-5 text-muted-foreground pointer-events-none z-10" />
+                    <select
+                      id="team"
+                      value={teamCode}
+                      onChange={(e) => setTeamCode(e.target.value)}
+                      required
+                      className="w-full pl-10 h-12 border-2 rounded-md bg-background text-sm appearance-none"
+                    >
+                      <option value="">Selecione sua equipe</option>
+                      {TEAM_OPTIONS.map((t) => (
+                        <option key={t.code} value={t.code}>
+                          {t.label}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                </div>
+              </>
             )}
 
             <div className="space-y-2">
