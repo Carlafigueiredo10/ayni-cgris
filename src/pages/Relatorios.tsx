@@ -1,7 +1,9 @@
 import { useEffect, useState } from "react";
 import { Navigate } from "react-router-dom";
+import { useQuery } from "@tanstack/react-query";
 import { useAuth } from "@/contexts/AuthContext";
 import { useTeamReport, type TeamReportRow } from "@/hooks/use-team-report";
+import { supabase } from "@/lib/supabase";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { BarChart3 } from "lucide-react";
@@ -35,6 +37,18 @@ const csvHeaders = [
 export default function Relatorios() {
   const { isAdmin, isManager, loading: authLoading } = useAuth();
   const { rows, loading, fetchReport } = useTeamReport();
+
+  const { data: teams = [] } = useQuery({
+    queryKey: ["teams"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("teams")
+        .select("code, name")
+        .order("code");
+      if (error) throw error;
+      return (data ?? []) as { code: string; name: string }[];
+    },
+  });
 
   const [teamFilter, setTeamFilter] = useState<string>("");
   const [monthFilter, setMonthFilter] = useState<string>(
@@ -149,8 +163,11 @@ export default function Relatorios() {
               className="block border rounded-md h-9 px-3 bg-background text-sm"
             >
               <option value="">Todas</option>
-              <option value="cocon">COCON</option>
-              <option value="codej">CODEJ</option>
+              {teams.map((t) => (
+                <option key={t.code} value={t.code}>
+                  {t.code.toUpperCase()}
+                </option>
+              ))}
             </select>
           </div>
         )}
