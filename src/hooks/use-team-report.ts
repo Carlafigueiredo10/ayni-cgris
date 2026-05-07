@@ -15,6 +15,7 @@ export type TeamReportRow = {
   media_minutos_controle: number | null;
   qtd_judicial: number;
   qtd_controle: number;
+  qtd_atos: number;
   qtd_reincidencias: number;
   taxa_reincidencia_pct: number | null;
 };

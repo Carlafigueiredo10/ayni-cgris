@@ -30,6 +30,7 @@ const csvHeaders = [
   { label: "Total min", key: "total_minutos" },
   { label: "Judicial", key: "qtd_judicial" },
   { label: "Controle", key: "qtd_controle" },
+  { label: "Atos", key: "qtd_atos" },
   { label: "Reincidencias", key: "qtd_reincidencias" },
   { label: "Taxa reincidencia %", key: "taxa_reincidencia_pct" },
 ];
@@ -70,9 +71,10 @@ export default function Relatorios() {
       minutos: acc.minutos + r.total_minutos,
       judicial: acc.judicial + r.qtd_judicial,
       controle: acc.controle + r.qtd_controle,
+      atos: acc.atos + r.qtd_atos,
       reincidencias: acc.reincidencias + r.qtd_reincidencias,
     }),
-    { processos: 0, minutos: 0, judicial: 0, controle: 0, reincidencias: 0 }
+    { processos: 0, minutos: 0, judicial: 0, controle: 0, atos: 0, reincidencias: 0 }
   );
 
   const exportPDF = () => {
@@ -96,6 +98,7 @@ export default function Relatorios() {
           "Total min",
           "Judicial",
           "Controle",
+          "Atos",
           "Reinc.",
           "% Reinc.",
         ],
@@ -109,6 +112,7 @@ export default function Relatorios() {
         r.total_minutos,
         r.qtd_judicial,
         r.qtd_controle,
+        r.qtd_atos,
         r.qtd_reincidencias,
         r.taxa_reincidencia_pct != null ? r.taxa_reincidencia_pct + "%" : "N/D",
       ]),
@@ -194,10 +198,10 @@ export default function Relatorios() {
         <Card>
           <CardContent className="pt-5 pb-4">
             <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
-              Judicial / Controle
+              Judicial / Controle / Atos
             </p>
             <p className="text-2xl font-bold">
-              {totals.judicial} / {totals.controle}
+              {totals.judicial} / {totals.controle} / {totals.atos}
             </p>
           </CardContent>
         </Card>
@@ -279,6 +283,7 @@ export default function Relatorios() {
                     <th className="pb-2 font-medium">Media min</th>
                     <th className="pb-2 font-medium">Judicial</th>
                     <th className="pb-2 font-medium">Controle</th>
+                    <th className="pb-2 font-medium">Atos</th>
                     <th className="pb-2 font-medium">Reinc. %</th>
                   </tr>
                 </thead>
@@ -294,6 +299,7 @@ export default function Relatorios() {
                       </td>
                       <td className="py-2">{r.qtd_judicial}</td>
                       <td className="py-2">{r.qtd_controle}</td>
+                      <td className="py-2">{r.qtd_atos}</td>
                       <td className="py-2">
                         {r.taxa_reincidencia_pct != null
                           ? r.taxa_reincidencia_pct + "%"
@@ -305,7 +311,7 @@ export default function Relatorios() {
                     <tr>
                       <td
                         className="py-8 text-center text-muted-foreground"
-                        colSpan={8}
+                        colSpan={9}
                       >
                         Sem dados para o periodo selecionado.
                       </td>
