@@ -11,17 +11,22 @@ export type Servidor = {
   team_name: string | null;
   presencial: boolean;
   ativo: boolean;
+  profile_id: string | null;
+  usuario_ativo: boolean;
 };
 
-type ServidorRow = {
-  id: string;
+type EquipeViewRow = {
+  servidor_id: string;
   nome: string;
   siape: string | null;
   email: string | null;
   team_id: string | null;
+  team_code: string | null;
+  team_name: string | null;
   presencial: boolean;
   ativo: boolean;
-  teams: { code: string; name: string } | null;
+  profile_id: string | null;
+  usuario_ativo: boolean;
 };
 
 export function useServidores() {
@@ -34,10 +39,8 @@ export function useServidores() {
 
     async function fetchServidores() {
       const { data, error } = await supabase
-        .from("servidores")
-        .select(
-          "id, nome, siape, email, team_id, presencial, ativo, teams(code, name)"
-        )
+        .from("equipe_view")
+        .select("*")
         .eq("ativo", true)
         .order("nome");
 
@@ -49,16 +52,18 @@ export function useServidores() {
         return;
       }
 
-      const mapped: Servidor[] = (data as unknown as ServidorRow[]).map((s) => ({
-        id: s.id,
+      const mapped: Servidor[] = (data as EquipeViewRow[]).map((s) => ({
+        id: s.servidor_id,
         nome: s.nome,
         siape: s.siape,
         email: s.email,
         team_id: s.team_id,
-        team_code: s.teams?.code ?? null,
-        team_name: s.teams?.name ?? null,
+        team_code: s.team_code,
+        team_name: s.team_name,
         presencial: s.presencial,
         ativo: s.ativo,
+        profile_id: s.profile_id,
+        usuario_ativo: s.usuario_ativo,
       }));
 
       setServidores(mapped);

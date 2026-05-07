@@ -72,6 +72,7 @@ export default function Equipe() {
                     <th className="text-left p-2">Equipe</th>
                     <th className="text-left p-2">Presencial</th>
                     <th className="text-left p-2">E-mail</th>
+                    <th className="text-left p-2">Status</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -84,13 +85,24 @@ export default function Equipe() {
                       </td>
                       <td className="p-2">{s.presencial ? "Sim" : "Não"}</td>
                       <td className="p-2">{s.email ?? "—"}</td>
+                      <td className="p-2">
+                        {s.usuario_ativo ? (
+                          <span className="inline-flex items-center rounded-full bg-emerald-100 px-2 py-0.5 text-[11px] font-medium text-emerald-800">
+                            Ativo no sistema
+                          </span>
+                        ) : (
+                          <span className="inline-flex items-center rounded-full bg-muted px-2 py-0.5 text-[11px] font-medium text-muted-foreground">
+                            Não ativado
+                          </span>
+                        )}
+                      </td>
                     </tr>
                   ))}
                   {filtrados.length === 0 && (
                     <tr>
                       <td
                         className="p-4 text-center text-muted-foreground"
-                        colSpan={5}
+                        colSpan={6}
                       >
                         Nenhum servidor encontrado.
                       </td>
