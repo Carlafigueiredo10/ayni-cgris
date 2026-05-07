@@ -23,6 +23,7 @@ const TEAM_OPTIONS = [
   { value: "", label: "— (transversal)" },
   { value: "cocon", label: "COCON" },
   { value: "codej", label: "CODEJ" },
+  { value: "natos", label: "NATOS" },
 ];
 
 export default function ServidorEditModal({
