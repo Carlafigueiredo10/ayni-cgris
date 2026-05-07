@@ -26,6 +26,7 @@ const LoginCard = () => {
   const TEAM_OPTIONS = [
     { code: "cocon", label: "COCON — Coordenação de Controle" },
     { code: "codej", label: "CODEJ — Coordenação de Demandas Judiciais" },
+    { code: "natos", label: "NATOS — Núcleo de Atos" },
   ];
 
   const handleSubmit = async (e: React.FormEvent) => {
