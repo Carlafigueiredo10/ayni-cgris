@@ -3,9 +3,10 @@ import { useAuth } from "@/contexts/AuthContext";
 import {
   FileText,
   TrendingUp,
-  Calendar,
   ClipboardList,
   Users,
+  Plane,
+  Megaphone,
   LogIn,
   LayoutDashboard,
 } from "lucide-react";
@@ -16,9 +17,10 @@ const linkClass =
 const internalLinks = [
   { label: "PGD", icon: FileText, href: "/pgd" },
   { label: "Entregas", icon: TrendingUp, href: "/productivity" },
-  { label: "Agenda", icon: Calendar, href: "/agenda" },
   { label: "Solicitação", icon: ClipboardList, href: "/solicitacao" },
   { label: "Equipe", icon: Users, href: "/equipe" },
+  { label: "Férias", icon: Plane, href: "/ferias" },
+  { label: "Comunicados", icon: Megaphone, href: "/comunicados" },
 ];
 
 export function Header() {
@@ -42,8 +44,6 @@ export function Header() {
 
         <nav className="hidden items-center gap-1 md:flex">
           <a className={linkClass} href="/#inicio">Início</a>
-          <a className={linkClass} href="/#sistema">O Sistema</a>
-          <a className={linkClass} href="/#atuacao">Atuação</a>
 
           <span className="mx-2 h-5 w-px bg-slate-200" aria-hidden="true" />
 
@@ -64,7 +64,7 @@ export function Header() {
             asChild
           >
             {loggedIn ? (
-              <a href="/productivity" className="flex items-center gap-1.5">
+              <a href="/meu-painel" className="flex items-center gap-1.5">
                 <LayoutDashboard className="h-4 w-4" />
                 Meu Painel
               </a>
@@ -85,7 +85,7 @@ export function Header() {
             asChild
           >
             {loggedIn ? (
-              <a href="/productivity">Meu Painel</a>
+              <a href="/meu-painel">Meu Painel</a>
             ) : (
               <a href="/login">Acessar</a>
             )}

@@ -19,6 +19,7 @@ import {
   getAssuntosByTipo,
   FAIXAS_MULTA,
   AREAS_ENCAMINHAMENTO,
+  AREAS_ENCAMINHAMENTO_ATOS,
   FAIXAS_ACAO_COLETIVA,
   FAIXAS_LOTE_INDICIOS,
 } from "@/lib/judicial-options";
@@ -486,7 +487,10 @@ export default function RegistroForm({
                   className="w-full border rounded-md h-10 px-3 bg-background text-sm"
                 >
                   <option value="">Selecione</option>
-                  {AREAS_ENCAMINHAMENTO.map((a) => (
+                  {(novo.tipoNatureza === "atos"
+                    ? AREAS_ENCAMINHAMENTO_ATOS
+                    : AREAS_ENCAMINHAMENTO
+                  ).map((a) => (
                     <option key={a.v} value={a.v}>
                       {a.l}
                     </option>

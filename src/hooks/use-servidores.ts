@@ -11,6 +11,9 @@ export type Servidor = {
   team_id: string | null;
   team_code: string | null;
   team_name: string | null;
+  subteam_id: string | null;
+  subteam_code: string | null;
+  subteam_name: string | null;
   regime: Regime | null;
   ativo: boolean;
   profile_id: string | null;
@@ -25,6 +28,7 @@ export type ServidorInput = {
   team_code: string;
   regime: Regime | "";
   ativo: boolean;
+  subteam_id?: string | null;   // null limpa, undefined nao mexe
 };
 
 type EquipeViewRow = {
@@ -35,6 +39,9 @@ type EquipeViewRow = {
   team_id: string | null;
   team_code: string | null;
   team_name: string | null;
+  subteam_id: string | null;
+  subteam_code: string | null;
+  subteam_name: string | null;
   regime: Regime | null;
   ativo: boolean;
   profile_id: string | null;
@@ -68,6 +75,9 @@ export function useServidores() {
       team_id: s.team_id,
       team_code: s.team_code,
       team_name: s.team_name,
+      subteam_id: s.subteam_id,
+      subteam_code: s.subteam_code,
+      subteam_name: s.subteam_name,
       regime: s.regime,
       ativo: s.ativo,
       profile_id: s.profile_id,
@@ -84,7 +94,7 @@ export function useServidores() {
 
   const save = useCallback(
     async (input: ServidorInput): Promise<boolean> => {
-      const { error } = await supabase.rpc("upsert_servidor", {
+      const { data: novoId, error } = await supabase.rpc("upsert_servidor", {
         p_id: input.id ?? null,
         p_nome: input.nome,
         p_siape: input.siape,
@@ -97,6 +107,19 @@ export function useServidores() {
       if (error) {
         toast.error("Erro ao salvar: " + error.message);
         return false;
+      }
+
+      const servidorId = (novoId as string | null) ?? input.id ?? null;
+
+      // Sub-equipe: undefined = nao mexer, null = limpar, string = atribuir
+      if (servidorId && input.subteam_id !== undefined) {
+        const { error: subErr } = await supabase.rpc("atribuir_subteam_servidor", {
+          p_servidor_id: servidorId,
+          p_subteam_id: input.subteam_id,
+        });
+        if (subErr) {
+          toast.error("Servidor salvo, mas falhou sub-equipe: " + subErr.message);
+        }
       }
 
       toast.success(input.id ? "Servidor atualizado" : "Servidor adicionado");

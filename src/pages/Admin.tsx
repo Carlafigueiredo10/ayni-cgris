@@ -31,6 +31,7 @@ import {
   MoreHorizontal,
   Search,
   Megaphone,
+  GitBranch,
 } from "lucide-react";
 
 type RoleValue = "admin_global" | "manager_cgris" | "manager_team" | "member";
@@ -175,6 +176,54 @@ export default function Admin() {
           </CardContent>
         </Card>
       )}
+
+      {/* Atalho fluxos / caixas SEI — admin e gestores */}
+      <Card>
+        <CardContent className="flex items-center justify-between pt-5 pb-4">
+          <div className="flex items-center gap-3">
+            <GitBranch className="h-5 w-5 text-primary" />
+            <div>
+              <p className="text-sm font-semibold text-foreground">
+                Fluxos e Caixas SEI
+              </p>
+              <p className="text-sm text-muted-foreground">
+                Editar descrição e responsável de cada caixa SEI da CGRIS
+              </p>
+            </div>
+          </div>
+          <Button asChild size="sm" variant="outline">
+            <Link to="/admin/fluxos">
+              Gerenciar fluxos
+              <ArrowRight className="ml-1 h-4 w-4" />
+            </Link>
+          </Button>
+        </CardContent>
+      </Card>
+
+      {/* Atalho equipes / sub-equipes — admin cria equipe; gestor cria sub-equipe */}
+      <Card>
+        <CardContent className="flex items-center justify-between pt-5 pb-4">
+          <div className="flex items-center gap-3">
+            <GitBranch className="h-5 w-5 text-primary" />
+            <div>
+              <p className="text-sm font-semibold text-foreground">
+                Equipes e sub-equipes
+              </p>
+              <p className="text-sm text-muted-foreground">
+                {isAdmin
+                  ? "Criar/renomear equipes da CGRIS e sub-equipes operacionais"
+                  : "Criar sub-equipes operacionais da sua coordenação"}
+              </p>
+            </div>
+          </div>
+          <Button asChild size="sm" variant="outline">
+            <Link to="/admin/equipes">
+              Gerenciar equipes
+              <ArrowRight className="ml-1 h-4 w-4" />
+            </Link>
+          </Button>
+        </CardContent>
+      </Card>
 
       {/* Stats */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">

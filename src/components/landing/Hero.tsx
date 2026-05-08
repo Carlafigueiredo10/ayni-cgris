@@ -41,7 +41,7 @@ export function Hero() {
               className="border-primary text-primary hover:bg-primary hover:text-white focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
               asChild
             >
-              <a href="/#atuacao">Conhecer a atuação</a>
+              <a href="/#sistema">Conhecer o sistema</a>
             </Button>
           </div>
 

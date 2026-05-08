@@ -9,6 +9,7 @@ export type Profile = {
   display_name: string | null;
   email: string | null;
   team_id: string | null;
+  subteam_id: string | null;
   role: "admin_global" | "manager_cgris" | "manager_team" | "member";
   is_active: boolean;
   siape: string | null;
@@ -51,7 +52,7 @@ async function loadProfileSafe(userId: string): Promise<Profile | null> {
       }
       const { data, error } = await supabase
         .from("profiles")
-        .select("id, display_name, email, team_id, role, is_active, siape, regime")
+        .select("id, display_name, email, team_id, subteam_id, role, is_active, siape, regime")
         .eq("id", userId)
         .single();
       if (error || !data) return null;

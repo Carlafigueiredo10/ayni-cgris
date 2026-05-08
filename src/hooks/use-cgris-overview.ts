@@ -2,6 +2,15 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/lib/supabase";
 import { format } from "date-fns";
 
+export type CgrisEquipeBreakdown = {
+  team_id: string;
+  code: string;
+  name: string;
+  processos: number;
+  servidores: number;
+  visivel: boolean;        // false quando < 3 servidores no mês (privacidade)
+};
+
 export type CgrisOverview = {
   mes: string;
   total_servidores_no_mes: number;
@@ -14,15 +23,7 @@ export type CgrisOverview = {
   qtd_atos: number;
   qtd_reincidencias: number;
   taxa_reincidencia_pct: number | null;
-  cocon_processos: number;
-  cocon_servidores: number;
-  cocon_visivel: boolean;
-  codej_processos: number;
-  codej_servidores: number;
-  codej_visivel: boolean;
-  natos_processos: number;
-  natos_servidores: number;
-  natos_visivel: boolean;
+  processos_por_equipe: CgrisEquipeBreakdown[];
 };
 
 export type CgrisMonthlyHistoryRow = {

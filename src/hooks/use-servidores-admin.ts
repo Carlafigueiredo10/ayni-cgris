@@ -13,6 +13,9 @@ export type ServidorAdmin = {
   email: string | null;
   team_id: string | null;
   team_code: string | null;
+  subteam_id: string | null;
+  subteam_code: string | null;
+  subteam_name: string | null;
   regime: Regime | null;
   ativo: boolean;
 };
@@ -23,9 +26,11 @@ type ServidorRow = {
   siape: string | null;
   email: string | null;
   team_id: string | null;
+  subteam_id: string | null;
   regime: Regime | null;
   ativo: boolean;
   teams: { code: string } | null;
+  subteam: { code: string; name: string } | null;
 };
 
 export function useServidoresAdmin() {
@@ -36,7 +41,9 @@ export function useServidoresAdmin() {
     setLoading(true);
     const { data, error } = await supabase
       .from("servidores")
-      .select("id, nome, siape, email, team_id, regime, ativo, teams(code)")
+      .select(
+        "id, nome, siape, email, team_id, subteam_id, regime, ativo, teams!servidores_team_id_fkey(code), subteam:teams!servidores_subteam_id_fkey(code, name)"
+      )
       .order("nome");
 
     if (error) {
@@ -52,6 +59,9 @@ export function useServidoresAdmin() {
       email: s.email,
       team_id: s.team_id,
       team_code: s.teams?.code ?? null,
+      subteam_id: s.subteam_id,
+      subteam_code: s.subteam?.code ?? null,
+      subteam_name: s.subteam?.name ?? null,
       regime: s.regime,
       ativo: s.ativo,
     }));
@@ -66,7 +76,7 @@ export function useServidoresAdmin() {
 
   const save = useCallback(
     async (input: ServidorInput) => {
-      const { error } = await supabase.rpc("upsert_servidor", {
+      const { data: novoId, error } = await supabase.rpc("upsert_servidor", {
         p_id: input.id ?? null,
         p_nome: input.nome,
         p_siape: input.siape,
@@ -79,6 +89,18 @@ export function useServidoresAdmin() {
       if (error) {
         toast.error("Erro ao salvar: " + error.message);
         return false;
+      }
+
+      const servidorId = (novoId as string | null) ?? input.id ?? null;
+
+      if (servidorId && input.subteam_id !== undefined) {
+        const { error: subErr } = await supabase.rpc("atribuir_subteam_servidor", {
+          p_servidor_id: servidorId,
+          p_subteam_id: input.subteam_id,
+        });
+        if (subErr) {
+          toast.error("Servidor salvo, mas falhou sub-equipe: " + subErr.message);
+        }
       }
 
       toast.success(input.id ? "Servidor atualizado" : "Servidor adicionado");

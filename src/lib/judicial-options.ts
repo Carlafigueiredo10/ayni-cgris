@@ -36,11 +36,20 @@ export const FAIXAS_MULTA: Option[] = [
   { v: "faixa_5", l: "Faixa 5 — acima de R$ 200.000" },
 ];
 
-// Areas para Encaminhamento (status = 'Encaminhado')
+// Areas para Encaminhamento (status = 'Encaminhado') — tipos judicial e controle
 export const AREAS_ENCAMINHAMENTO: Option[] = [
   { v: "cgris_interno", l: "CGRIS — área interna" },
   { v: "aj", l: "AJ" },
   { v: "digep", l: "DIGEP" },
+  { v: "cgben", l: "CGBEN" },
+  { v: "cgpag", l: "CGPAG" },
+  { v: "outros", l: "Outros (descrever)" },
+];
+
+// Areas para Encaminhamento quando tipo = atos (fluxo proprio do NATOS)
+export const AREAS_ENCAMINHAMENTO_ATOS: Option[] = [
+  { v: "para_revisao", l: "Para Revisão" },
+  { v: "solicitacao_afd", l: "Solicitação AFD" },
   { v: "outros", l: "Outros (descrever)" },
 ];
 

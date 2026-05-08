@@ -174,43 +174,23 @@ const EmNumeros = () => {
               </CardHeader>
               <CardContent>
                 <ul className="space-y-2 text-sm">
-                  <li className="flex items-center justify-between">
-                    <span className="flex items-center gap-2">
-                      <span className="h-2 w-2 rounded-full bg-primary"></span>
-                      COCON
-                    </span>
-                    <span className="font-semibold tabular-nums">
-                      {overview.cocon_visivel
-                        ? overview.cocon_processos
-                        : "—"}
-                    </span>
-                  </li>
-                  <li className="flex items-center justify-between">
-                    <span className="flex items-center gap-2">
-                      <span className="h-2 w-2 rounded-full bg-accent"></span>
-                      CODEJ
-                    </span>
-                    <span className="font-semibold tabular-nums">
-                      {overview.codej_visivel
-                        ? overview.codej_processos
-                        : "—"}
-                    </span>
-                  </li>
-                  <li className="flex items-center justify-between">
-                    <span className="flex items-center gap-2">
-                      <span className="h-2 w-2 rounded-full bg-muted-foreground"></span>
-                      NATOS
-                    </span>
-                    <span className="font-semibold tabular-nums">
-                      {overview.natos_visivel
-                        ? overview.natos_processos
-                        : "—"}
-                    </span>
-                  </li>
+                  {overview.processos_por_equipe.length === 0 ? (
+                    <li className="text-muted-foreground">Nenhuma equipe cadastrada.</li>
+                  ) : (
+                    overview.processos_por_equipe.map((eq) => (
+                      <li key={eq.team_id} className="flex items-center justify-between">
+                        <span className="flex items-center gap-2">
+                          <span className="h-2 w-2 rounded-full bg-primary"></span>
+                          {eq.code.toUpperCase()}
+                        </span>
+                        <span className="font-semibold tabular-nums">
+                          {eq.visivel ? eq.processos : "—"}
+                        </span>
+                      </li>
+                    ))
+                  )}
                 </ul>
-                {(!overview.cocon_visivel ||
-                  !overview.codej_visivel ||
-                  !overview.natos_visivel) && (
+                {overview.processos_por_equipe.some((eq) => !eq.visivel) && (
                   <p className="text-xs text-muted-foreground mt-3">
                     "—" indica coordenacao com menos de 3 servidores ativos no
                     periodo (privacidade).

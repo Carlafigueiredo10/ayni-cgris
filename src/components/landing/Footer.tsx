@@ -32,11 +32,6 @@ export function Footer() {
                   O Sistema
                 </a>
               </li>
-              <li>
-                <a className="rounded hover:text-white transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-primary" href="/#atuacao">
-                  Atuação
-                </a>
-              </li>
             </ul>
           </div>
 

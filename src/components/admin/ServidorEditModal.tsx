@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import {
   Dialog,
   DialogContent,
@@ -12,6 +12,7 @@ import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import type { ServidorInput } from "@/hooks/use-servidores";
 import type { Regime } from "@/contexts/AuthContext";
+import { useTeams } from "@/hooks/use-teams";
 
 export type ServidorEditTarget = {
   id: string;
@@ -19,6 +20,7 @@ export type ServidorEditTarget = {
   siape: string | null;
   email: string | null;
   team_code: string | null;
+  subteam_id: string | null;
   regime: Regime | null;
   ativo: boolean;
 };
@@ -35,13 +37,6 @@ type Props = {
   lockedTeamCode?: string | null;
 };
 
-const TEAM_OPTIONS = [
-  { value: "", label: "— (transversal)" },
-  { value: "cocon", label: "COCON" },
-  { value: "codej", label: "CODEJ" },
-  { value: "natos", label: "NATOS" },
-];
-
 export default function ServidorEditModal({
   open,
   onOpenChange,
@@ -49,13 +44,37 @@ export default function ServidorEditModal({
   onSave,
   lockedTeamCode,
 }: Props) {
+  const { data: teams = [] } = useTeams();
+  const teamOptions = useMemo(() => {
+    const principais = teams
+      .filter((t) => t.parent_id === null && t.active)
+      .sort((a, b) => a.code.localeCompare(b.code));
+    return [
+      { value: "", label: "— (transversal)" },
+      ...principais.map((t) => ({
+        value: t.code,
+        label: t.code.toUpperCase(),
+      })),
+    ];
+  }, [teams]);
+
   const [nome, setNome] = useState("");
   const [siape, setSiape] = useState("");
   const [email, setEmail] = useState("");
   const [teamCode, setTeamCode] = useState("");
+  const [subteamId, setSubteamId] = useState<string>("");  // "" = nenhuma
   const [regime, setRegime] = useState<Regime | "">("");
   const [ativo, setAtivo] = useState(true);
   const [saving, setSaving] = useState(false);
+
+  // Sub-equipes ativas da equipe principal selecionada
+  const subteamOptions = useMemo(() => {
+    const parent = teams.find((t) => t.code === teamCode && t.parent_id === null);
+    if (!parent) return [];
+    return teams
+      .filter((t) => t.parent_id === parent.id && t.active)
+      .sort((a, b) => a.name.localeCompare(b.name));
+  }, [teams, teamCode]);
 
   useEffect(() => {
     if (open) {
@@ -65,10 +84,18 @@ export default function ServidorEditModal({
       setTeamCode(
         lockedTeamCode ?? servidor?.team_code ?? ""
       );
+      setSubteamId(servidor?.subteam_id ?? "");
       setRegime((servidor?.regime as Regime | null) ?? "");
       setAtivo(servidor?.ativo ?? true);
     }
   }, [open, servidor, lockedTeamCode]);
+
+  // Trocar a equipe principal limpa a sub-equipe (servidor passa a outra coordenacao)
+  useEffect(() => {
+    if (!servidor || teamCode !== (servidor.team_code ?? "")) {
+      setSubteamId("");
+    }
+  }, [teamCode, servidor]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -81,6 +108,7 @@ export default function ServidorEditModal({
       team_code: lockedTeamCode ?? teamCode,
       regime,
       ativo,
+      subteam_id: subteamId || null,
     });
     setSaving(false);
     if (ok) onOpenChange(false);
@@ -124,7 +152,7 @@ export default function ServidorEditModal({
                 disabled={!!lockedTeamCode}
                 className="w-full border rounded-md h-10 px-3 bg-background text-sm disabled:opacity-60 disabled:cursor-not-allowed"
               >
-                {TEAM_OPTIONS.map((t) => (
+                {teamOptions.map((t) => (
                   <option key={t.value} value={t.value}>
                     {t.label}
                   </option>
@@ -137,6 +165,29 @@ export default function ServidorEditModal({
               )}
             </div>
           </div>
+
+          {subteamOptions.length > 0 && (
+            <div className="space-y-2">
+              <Label htmlFor="subteam">Sub-equipe (opcional)</Label>
+              <select
+                id="subteam"
+                value={subteamId}
+                onChange={(e) => setSubteamId(e.target.value)}
+                className="w-full border rounded-md h-10 px-3 bg-background text-sm"
+              >
+                <option value="">— Sem sub-equipe</option>
+                {subteamOptions.map((sub) => (
+                  <option key={sub.id} value={sub.id}>
+                    {sub.name}
+                  </option>
+                ))}
+              </select>
+              <p className="text-[11px] text-muted-foreground">
+                Agrupamento operacional dentro da coordenação.
+                Não muda relatórios nem permissões.
+              </p>
+            </div>
+          )}
 
           <div className="space-y-2">
             <Label htmlFor="email">Email</Label>

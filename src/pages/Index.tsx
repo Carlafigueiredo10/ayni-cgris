@@ -1,6 +1,5 @@
 import { Header } from "@/components/landing/Header";
 import { Hero } from "@/components/landing/Hero";
-import { Atuacao } from "@/components/landing/Atuacao";
 import { Sistema } from "@/components/landing/Sistema";
 import { Modules } from "@/components/landing/Modules";
 import { ComoFunciona } from "@/components/landing/ComoFunciona";
@@ -12,7 +11,6 @@ export default function Index() {
       <Header />
       <main>
         <Hero />
-        <Atuacao />
         <Sistema />
         <Modules />
         <ComoFunciona />

@@ -14,16 +14,20 @@ import Productivity from "./pages/Productivity";
 import EmNumeros from "./pages/em_numeros";
 import Biblioteca from "./pages/Biblioteca";
 import Solicitacoes from "./pages/Solicitacoes";
-import Agenda from "./pages/agenda";
 import Equipe from "./pages/Equipe";
 import PGD from "./pages/PGD";
 import Admin from "./pages/Admin";
 import AdminServidores from "./pages/AdminServidores";
 import AdminComunicados from "./pages/AdminComunicados";
+import AdminEquipes from "./pages/AdminEquipes";
 import Comunicados from "./pages/Comunicados";
 import Relatorios from "./pages/Relatorios";
 import Perfil from "./pages/Perfil";
 import Ferias from "./pages/Ferias";
+import Fluxos from "./pages/Fluxos";
+import AdminFluxos from "./pages/AdminFluxos";
+import MeuPainelHome from "./pages/MeuPainelHome";
+import MeuPainelTarefas from "./pages/MeuPainelTarefas";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -66,21 +70,26 @@ const App = () => (
             <Route element={<ProtectedRoute />}>
               <Route element={<PrivateLayout />}>
                 <Route path="/wellness" element={<Wellness />} />
-                <Route path="/productivity" element={<Productivity />} />
+                <Route path="/productivity" element={<Navigate to="/meu-painel/entregas" replace />} />
+                <Route path="/meu-painel" element={<MeuPainelHome />} />
+                <Route path="/meu-painel/entregas" element={<Productivity />} />
+                <Route path="/meu-painel/tarefas" element={<MeuPainelTarefas />} />
                 <Route path="/em-numeros" element={<EmNumeros />} />
                 <Route path="/pgd" element={<PGD />} />
                 <Route path="/equipe" element={<Equipe />} />
                 <Route path="/solicitacoes" element={<Solicitacoes />} />
                 <Route path="/solicitacao" element={<Solicitacoes />} />
                 <Route path="/biblioteca" element={<Biblioteca />} />
-                <Route path="/agenda" element={<Agenda />} />
                 <Route path="/relatorios" element={<Relatorios />} />
                 <Route path="/comunicados" element={<Comunicados />} />
                 <Route path="/admin" element={<Admin />} />
                 <Route path="/admin/servidores" element={<AdminServidores />} />
                 <Route path="/admin/comunicados" element={<AdminComunicados />} />
+                <Route path="/admin/equipes" element={<AdminEquipes />} />
+                <Route path="/admin/fluxos" element={<AdminFluxos />} />
                 <Route path="/perfil" element={<Perfil />} />
                 <Route path="/ferias" element={<Ferias />} />
+                <Route path="/fluxos" element={<Fluxos />} />
               </Route>
             </Route>
 

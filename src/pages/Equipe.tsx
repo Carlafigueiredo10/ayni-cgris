@@ -11,6 +11,7 @@ import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Plus, Pencil, Upload } from "lucide-react";
 import { useServidores, type Servidor } from "@/hooks/use-servidores";
+import { useTeams } from "@/hooks/use-teams";
 import { useAuth } from "@/contexts/AuthContext";
 import ServidorEditModal, {
   type ServidorEditTarget,
@@ -19,7 +20,16 @@ import EquipeImportCsvModal from "@/components/equipe/EquipeImportCsvModal";
 
 export default function Equipe() {
   const { servidores, loading, error, save, refresh } = useServidores();
+  const { data: teams = [] } = useTeams();
   const { isAdmin, isManagerCgris, isManager, profile } = useAuth();
+
+  const equipesPrincipais = useMemo(
+    () =>
+      teams
+        .filter((t) => t.parent_id === null && t.active)
+        .sort((a, b) => a.code.localeCompare(b.code)),
+    [teams]
+  );
 
   const [busca, setBusca] = useState("");
   const [filtroEquipe, setFiltroEquipe] = useState<string>("");
@@ -95,6 +105,7 @@ export default function Equipe() {
         siape: editing.siape,
         email: editing.email,
         team_code: editing.team_code,
+        subteam_id: editing.subteam_id,
         regime: editing.regime,
         ativo: editing.ativo,
       }
@@ -161,9 +172,11 @@ export default function Equipe() {
                 className="w-full h-10 rounded-md border bg-background px-3 text-sm"
               >
                 <option value="">Todas</option>
-                <option value="cocon">COCON</option>
-                <option value="codej">CODEJ</option>
-                <option value="natos">NATOS</option>
+                {equipesPrincipais.map((eq) => (
+                  <option key={eq.code} value={eq.code}>
+                    {eq.code.toUpperCase()}
+                  </option>
+                ))}
                 <option value="__none__">Sem equipe</option>
               </select>
             </div>
@@ -207,6 +220,7 @@ export default function Equipe() {
                     <th className="text-left p-2">Nome</th>
                     <th className="text-left p-2">SIAPE</th>
                     <th className="text-left p-2">Equipe</th>
+                    <th className="text-left p-2">Sub-equipe</th>
                     <th className="text-left p-2">Regime</th>
                     <th className="text-left p-2">E-mail</th>
                     <th className="text-left p-2">Status</th>
@@ -220,6 +234,15 @@ export default function Equipe() {
                       <td className="p-2">{s.siape ?? "—"}</td>
                       <td className="p-2">
                         {s.team_code ? s.team_code.toUpperCase() : "—"}
+                      </td>
+                      <td className="p-2">
+                        {s.subteam_name ? (
+                          <span className="inline-flex items-center rounded-full bg-indigo-50 px-2 py-0.5 text-[11px] font-medium text-indigo-700 border border-indigo-200">
+                            {s.subteam_name}
+                          </span>
+                        ) : (
+                          <span className="text-muted-foreground">—</span>
+                        )}
                       </td>
                       <td className="p-2 capitalize">{s.regime ?? "—"}</td>
                       <td className="p-2">{s.email ?? "—"}</td>
@@ -259,7 +282,7 @@ export default function Equipe() {
                     <tr>
                       <td
                         className="p-4 text-center text-muted-foreground"
-                        colSpan={canEdit ? 7 : 6}
+                        colSpan={canEdit ? 8 : 7}
                       >
                         Nenhum servidor encontrado.
                       </td>

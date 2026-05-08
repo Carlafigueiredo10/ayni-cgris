@@ -18,9 +18,9 @@ const modules: ModuleItem[] = [
   },
   {
     title: "Fluxos e Procedimentos",
-    desc: "Consulte fluxos de trabalho e procedimentos da coordenação.",
-    href: "/solicitacoes",
-    status: "soon",
+    desc: "Caixas SEI da CGRIS e o que cada uma trata — para onde enviar cada demanda.",
+    href: "/fluxos",
+    status: "available",
   },
   {
     title: "CGRIS em Números",

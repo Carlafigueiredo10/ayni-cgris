@@ -119,6 +119,7 @@ export default function AdminServidores() {
                     <th className="pb-2 font-medium">Nome</th>
                     <th className="pb-2 font-medium">SIAPE</th>
                     <th className="pb-2 font-medium">Equipe</th>
+                    <th className="pb-2 font-medium">Sub-equipe</th>
                     <th className="pb-2 font-medium">Regime</th>
                     <th className="pb-2 font-medium">Email</th>
                     <th className="pb-2 font-medium">Status</th>
@@ -137,6 +138,15 @@ export default function AdminServidores() {
                       <td className="py-2">{s.siape ?? "—"}</td>
                       <td className="py-2">
                         {s.team_code ? s.team_code.toUpperCase() : "—"}
+                      </td>
+                      <td className="py-2">
+                        {s.subteam_name ? (
+                          <span className="inline-flex items-center rounded-full bg-indigo-50 px-2 py-0.5 text-[11px] font-medium text-indigo-700 border border-indigo-200">
+                            {s.subteam_name}
+                          </span>
+                        ) : (
+                          <span className="text-muted-foreground">—</span>
+                        )}
                       </td>
                       <td className="py-2 capitalize">{s.regime ?? "—"}</td>
                       <td className="py-2">{s.email ?? "—"}</td>
@@ -166,7 +176,7 @@ export default function AdminServidores() {
                     <tr>
                       <td
                         className="py-8 text-center text-muted-foreground"
-                        colSpan={7}
+                        colSpan={8}
                       >
                         Nenhum servidor encontrado.
                       </td>

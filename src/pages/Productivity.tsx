@@ -14,6 +14,7 @@ import ConsolidadoTable from "@/components/productivity/ConsolidadoTable";
 import ReincidenciaModal from "@/components/productivity/ReincidenciaModal";
 import { useCoordinationData } from "@/hooks/use-coordination-data";
 import { useMyScore } from "@/hooks/use-my-score";
+import { MeuPainelNav } from "@/components/meu-painel/MeuPainelNav";
 
 const Productivity = () => {
   const { registros, stats, checkReincidence, checkCpfHistory, addRegistro } =
@@ -75,6 +76,8 @@ const Productivity = () => {
 
   return (
     <div className="space-y-6">
+      <MeuPainelNav />
+
       <div className="flex items-center gap-3">
         <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary">
           <TrendingUp className="h-5 w-5 text-primary-foreground" />

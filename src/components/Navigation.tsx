@@ -2,9 +2,7 @@ import { useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import {
   Users,
-  TrendingUp,
   FileText,
-  Calendar,
   ClipboardList,
   BarChart3,
   Settings,
@@ -12,6 +10,7 @@ import {
   UserCircle,
   Megaphone,
   Plane,
+  ListChecks,
 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 
@@ -21,8 +20,7 @@ const Navigation = () => {
 
   const items = [
     { label: "PGD", icon: FileText, href: "/pgd" },
-    { label: "Entregas", icon: TrendingUp, href: "/productivity" },
-    { label: "Agenda", icon: Calendar, href: "/agenda" },
+    { label: "Meu Painel", icon: ListChecks, href: "/meu-painel" },
     { label: "Solicitacao", icon: ClipboardList, href: "/solicitacao" },
     { label: "Equipe", icon: Users, href: "/equipe" },
     { label: "Ferias", icon: Plane, href: "/ferias" },
@@ -56,9 +54,9 @@ const Navigation = () => {
               }`}
               asChild
             >
-              <a href={item.href} className="flex items-center gap-1.5">
+              <a href={item.href} className="flex items-center gap-1.5" title={item.label}>
                 <item.icon className="h-4 w-4" />
-                <span className="text-sm font-medium">{item.label}</span>
+                <span className="hidden text-sm font-medium xl:inline">{item.label}</span>
               </a>
             </Button>
           );
@@ -73,9 +71,9 @@ const Navigation = () => {
         }`}
         asChild
       >
-        <a href="/perfil" className="flex items-center gap-1.5">
+        <a href="/perfil" className="flex items-center gap-1.5" title="Perfil">
           <UserCircle className="h-4 w-4" />
-          <span className="text-sm font-medium hidden md:inline">Perfil</span>
+          <span className="text-sm font-medium hidden xl:inline">Perfil</span>
         </a>
       </Button>
 
