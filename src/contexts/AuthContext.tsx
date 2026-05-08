@@ -2,6 +2,8 @@ import { createContext, useContext, useEffect, useState, ReactNode } from "react
 import { User } from "@supabase/supabase-js";
 import { supabase } from "@/lib/supabase";
 
+export type Regime = "presencial" | "remoto" | "hibrido";
+
 export type Profile = {
   id: string;
   display_name: string | null;
@@ -9,6 +11,8 @@ export type Profile = {
   team_id: string | null;
   role: "admin_global" | "manager_cgris" | "manager_team" | "member";
   is_active: boolean;
+  siape: string | null;
+  regime: Regime | null;
 };
 
 type AuthContextType = {
@@ -47,7 +51,7 @@ async function loadProfileSafe(userId: string): Promise<Profile | null> {
       }
       const { data, error } = await supabase
         .from("profiles")
-        .select("id, display_name, email, team_id, role, is_active")
+        .select("id, display_name, email, team_id, role, is_active, siape, regime")
         .eq("id", userId)
         .single();
       if (error || !data) return null;

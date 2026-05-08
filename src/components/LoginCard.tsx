@@ -5,10 +5,11 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Mail, Lock, User, Users } from "lucide-react";
+import { Mail, Lock, User, Users, Hash, Briefcase } from "lucide-react";
 import { toast } from "sonner";
 
 type Mode = "signin" | "signup" | "forgot";
+type Regime = "presencial" | "remoto" | "hibrido";
 
 const LoginCard = () => {
   const navigate = useNavigate();
@@ -20,6 +21,8 @@ const LoginCard = () => {
   const [password, setPassword] = useState("");
   const [nome, setNome] = useState("");
   const [teamCode, setTeamCode] = useState("");
+  const [siape, setSiape] = useState("");
+  const [regime, setRegime] = useState<Regime | "">("");
 
   const ALLOWED_DOMAIN = "@gestao.gov.br";
 
@@ -27,6 +30,12 @@ const LoginCard = () => {
     { code: "cocon", label: "COCON — Coordenação de Controle" },
     { code: "codej", label: "CODEJ — Coordenação de Demandas Judiciais" },
     { code: "natos", label: "NATOS — Núcleo de Atos" },
+  ];
+
+  const REGIME_OPTIONS: { value: Regime; label: string }[] = [
+    { value: "presencial", label: "Presencial" },
+    { value: "remoto", label: "Remoto" },
+    { value: "hibrido", label: "Híbrido" },
   ];
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -44,11 +53,23 @@ const LoginCard = () => {
         setLoading(false);
         return;
       }
+      if (!regime) {
+        toast.error("Selecione seu regime de trabalho");
+        setLoading(false);
+        return;
+      }
 
       const { error } = await supabase.auth.signUp({
         email,
         password,
-        options: { data: { nome, team_code: teamCode } },
+        options: {
+          data: {
+            nome,
+            team_code: teamCode,
+            siape: siape.trim() || null,
+            regime,
+          },
+        },
       });
       if (error) {
         toast.error("Erro ao cadastrar: " + error.message);
@@ -136,6 +157,42 @@ const LoginCard = () => {
                       {TEAM_OPTIONS.map((t) => (
                         <option key={t.code} value={t.code}>
                           {t.label}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="siape">SIAPE</Label>
+                  <div className="relative">
+                    <Hash className="absolute left-3 top-3 h-5 w-5 text-muted-foreground" />
+                    <Input
+                      id="siape"
+                      placeholder="Sua matrícula SIAPE"
+                      value={siape}
+                      onChange={(e) => setSiape(e.target.value)}
+                      className="pl-10 h-12 border-2"
+                      required
+                    />
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="regime">Regime de trabalho</Label>
+                  <div className="relative">
+                    <Briefcase className="absolute left-3 top-3 h-5 w-5 text-muted-foreground pointer-events-none z-10" />
+                    <select
+                      id="regime"
+                      value={regime}
+                      onChange={(e) => setRegime(e.target.value as Regime | "")}
+                      required
+                      className="w-full pl-10 h-12 border-2 rounded-md bg-background text-sm appearance-none"
+                    >
+                      <option value="">Selecione o regime</option>
+                      {REGIME_OPTIONS.map((r) => (
+                        <option key={r.value} value={r.value}>
+                          {r.label}
                         </option>
                       ))}
                     </select>

@@ -23,6 +23,8 @@ type UpdateProfilePayload = {
   user_id: string;
   display_name?: string;
   email?: string;
+  siape?: string | null;
+  regime?: "presencial" | "remoto" | "hibrido" | null;
 };
 
 type CreateResult = {

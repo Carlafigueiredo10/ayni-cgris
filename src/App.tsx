@@ -19,7 +19,11 @@ import Equipe from "./pages/Equipe";
 import PGD from "./pages/PGD";
 import Admin from "./pages/Admin";
 import AdminServidores from "./pages/AdminServidores";
+import AdminComunicados from "./pages/AdminComunicados";
+import Comunicados from "./pages/Comunicados";
 import Relatorios from "./pages/Relatorios";
+import Perfil from "./pages/Perfil";
+import Ferias from "./pages/Ferias";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -71,8 +75,12 @@ const App = () => (
                 <Route path="/biblioteca" element={<Biblioteca />} />
                 <Route path="/agenda" element={<Agenda />} />
                 <Route path="/relatorios" element={<Relatorios />} />
+                <Route path="/comunicados" element={<Comunicados />} />
                 <Route path="/admin" element={<Admin />} />
                 <Route path="/admin/servidores" element={<AdminServidores />} />
+                <Route path="/admin/comunicados" element={<AdminComunicados />} />
+                <Route path="/perfil" element={<Perfil />} />
+                <Route path="/ferias" element={<Ferias />} />
               </Route>
             </Route>
 

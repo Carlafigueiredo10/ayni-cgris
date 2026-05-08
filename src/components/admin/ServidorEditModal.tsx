@@ -10,13 +10,29 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
-import type { ServidorAdmin, ServidorInput } from "@/hooks/use-servidores-admin";
+import type { ServidorInput } from "@/hooks/use-servidores";
+import type { Regime } from "@/contexts/AuthContext";
+
+export type ServidorEditTarget = {
+  id: string;
+  nome: string;
+  siape: string | null;
+  email: string | null;
+  team_code: string | null;
+  regime: Regime | null;
+  ativo: boolean;
+};
 
 type Props = {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  servidor: ServidorAdmin | null;
+  servidor: ServidorEditTarget | null;
   onSave: (input: ServidorInput) => Promise<boolean>;
+  /**
+   * Quando passado, trava o select de equipe nesse code (manager_team).
+   * O backend tambem valida — isso e so UX.
+   */
+  lockedTeamCode?: string | null;
 };
 
 const TEAM_OPTIONS = [
@@ -31,12 +47,13 @@ export default function ServidorEditModal({
   onOpenChange,
   servidor,
   onSave,
+  lockedTeamCode,
 }: Props) {
   const [nome, setNome] = useState("");
   const [siape, setSiape] = useState("");
   const [email, setEmail] = useState("");
   const [teamCode, setTeamCode] = useState("");
-  const [presencial, setPresencial] = useState(false);
+  const [regime, setRegime] = useState<Regime | "">("");
   const [ativo, setAtivo] = useState(true);
   const [saving, setSaving] = useState(false);
 
@@ -45,11 +62,13 @@ export default function ServidorEditModal({
       setNome(servidor?.nome ?? "");
       setSiape(servidor?.siape ?? "");
       setEmail(servidor?.email ?? "");
-      setTeamCode(servidor?.team_code ?? "");
-      setPresencial(servidor?.presencial ?? false);
+      setTeamCode(
+        lockedTeamCode ?? servidor?.team_code ?? ""
+      );
+      setRegime((servidor?.regime as Regime | null) ?? "");
       setAtivo(servidor?.ativo ?? true);
     }
-  }, [open, servidor]);
+  }, [open, servidor, lockedTeamCode]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -59,8 +78,8 @@ export default function ServidorEditModal({
       nome,
       siape,
       email,
-      team_code: teamCode,
-      presencial,
+      team_code: lockedTeamCode ?? teamCode,
+      regime,
       ativo,
     });
     setSaving(false);
@@ -102,7 +121,8 @@ export default function ServidorEditModal({
                 id="team"
                 value={teamCode}
                 onChange={(e) => setTeamCode(e.target.value)}
-                className="w-full border rounded-md h-10 px-3 bg-background text-sm"
+                disabled={!!lockedTeamCode}
+                className="w-full border rounded-md h-10 px-3 bg-background text-sm disabled:opacity-60 disabled:cursor-not-allowed"
               >
                 {TEAM_OPTIONS.map((t) => (
                   <option key={t.value} value={t.value}>
@@ -110,6 +130,11 @@ export default function ServidorEditModal({
                   </option>
                 ))}
               </select>
+              {lockedTeamCode && (
+                <p className="text-[11px] text-muted-foreground">
+                  Gestor de equipe edita apenas a própria coordenação.
+                </p>
+              )}
             </div>
           </div>
 
@@ -124,14 +149,22 @@ export default function ServidorEditModal({
             />
           </div>
 
-          <div className="flex gap-6 pt-2">
-            <label className="flex items-center gap-2 text-sm">
-              <Checkbox
-                checked={presencial}
-                onCheckedChange={(v) => setPresencial(v === true)}
-              />
-              Presencial
-            </label>
+          <div className="space-y-2">
+            <Label htmlFor="regime">Regime de trabalho</Label>
+            <select
+              id="regime"
+              value={regime}
+              onChange={(e) => setRegime(e.target.value as Regime | "")}
+              className="w-full border rounded-md h-10 px-3 bg-background text-sm"
+            >
+              <option value="">Não definido</option>
+              <option value="presencial">Presencial</option>
+              <option value="remoto">Remoto</option>
+              <option value="hibrido">Híbrido</option>
+            </select>
+          </div>
+
+          <div className="pt-2">
             <label className="flex items-center gap-2 text-sm">
               <Checkbox
                 checked={ativo}

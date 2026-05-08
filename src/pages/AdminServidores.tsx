@@ -119,7 +119,7 @@ export default function AdminServidores() {
                     <th className="pb-2 font-medium">Nome</th>
                     <th className="pb-2 font-medium">SIAPE</th>
                     <th className="pb-2 font-medium">Equipe</th>
-                    <th className="pb-2 font-medium">Presencial</th>
+                    <th className="pb-2 font-medium">Regime</th>
                     <th className="pb-2 font-medium">Email</th>
                     <th className="pb-2 font-medium">Status</th>
                     <th className="pb-2 font-medium w-20">Ação</th>
@@ -138,7 +138,7 @@ export default function AdminServidores() {
                       <td className="py-2">
                         {s.team_code ? s.team_code.toUpperCase() : "—"}
                       </td>
-                      <td className="py-2">{s.presencial ? "Sim" : "Não"}</td>
+                      <td className="py-2 capitalize">{s.regime ?? "—"}</td>
                       <td className="py-2">{s.email ?? "—"}</td>
                       <td className="py-2">
                         <span

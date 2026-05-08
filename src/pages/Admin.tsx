@@ -30,6 +30,7 @@ import {
   ArrowRight,
   MoreHorizontal,
   Search,
+  Megaphone,
 } from "lucide-react";
 
 type RoleValue = "admin_global" | "manager_cgris" | "manager_team" | "member";
@@ -143,6 +144,31 @@ export default function Admin() {
             <Button asChild size="sm" variant="outline">
               <Link to="/admin/servidores">
                 Gerenciar servidores
+                <ArrowRight className="ml-1 h-4 w-4" />
+              </Link>
+            </Button>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Atalho comunicados */}
+      {isAdmin && (
+        <Card>
+          <CardContent className="flex items-center justify-between pt-5 pb-4">
+            <div className="flex items-center gap-3">
+              <Megaphone className="h-5 w-5 text-primary" />
+              <div>
+                <p className="text-sm font-semibold text-foreground">
+                  Comunicados
+                </p>
+                <p className="text-sm text-muted-foreground">
+                  Cadastrar comunicados oficiais publicados pela CGRIS
+                </p>
+              </div>
+            </div>
+            <Button asChild size="sm" variant="outline">
+              <Link to="/admin/comunicados">
+                Gerenciar comunicados
                 <ArrowRight className="ml-1 h-4 w-4" />
               </Link>
             </Button>
@@ -586,6 +612,8 @@ function CreateUserDialog({
 // ============================================================
 // EditProfileDialog
 // ============================================================
+type RegimeValue = "presencial" | "remoto" | "hibrido";
+
 function EditProfileDialog({
   target,
   currentUserId,
@@ -600,11 +628,15 @@ function EditProfileDialog({
     user_id: string;
     display_name?: string;
     email?: string;
+    siape?: string | null;
+    regime?: RegimeValue | null;
   }) => void;
   loading: boolean;
 }) {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
+  const [siape, setSiape] = useState("");
+  const [regime, setRegime] = useState<RegimeValue | "">("");
 
   const isOpen = !!target;
   const isProtectedAdmin =
@@ -614,6 +646,8 @@ function EditProfileDialog({
     if (target) {
       setName(target.display_name || "");
       setEmail(target.email || "");
+      setSiape(target.siape || "");
+      setRegime((target.regime as RegimeValue | null) || "");
     }
   }, [target]);
 
@@ -625,6 +659,8 @@ function EditProfileDialog({
           onClose();
           setName("");
           setEmail("");
+          setSiape("");
+          setRegime("");
         }
       }}
     >
@@ -633,8 +669,8 @@ function EditProfileDialog({
           <DialogTitle>Editar perfil</DialogTitle>
           <DialogDescription>
             {isProtectedAdmin
-              ? "Apenas o nome de outro admin pode ser alterado."
-              : "Atualizar nome e email."}
+              ? "Apenas nome, SIAPE e regime de outro admin podem ser alterados."
+              : "Atualizar nome, email, SIAPE e regime."}
           </DialogDescription>
         </DialogHeader>
         <div className="space-y-3">
@@ -650,6 +686,23 @@ function EditProfileDialog({
               disabled={isProtectedAdmin}
             />
           </div>
+          <div>
+            <Label>SIAPE</Label>
+            <Input value={siape} onChange={(e) => setSiape(e.target.value)} />
+          </div>
+          <div>
+            <Label>Regime de trabalho</Label>
+            <select
+              value={regime}
+              onChange={(e) => setRegime(e.target.value as RegimeValue | "")}
+              className="w-full h-10 rounded-md border bg-background px-3 text-sm"
+            >
+              <option value="">Não definido</option>
+              <option value="presencial">Presencial</option>
+              <option value="remoto">Remoto</option>
+              <option value="hibrido">Híbrido</option>
+            </select>
+          </div>
         </div>
         <DialogFooter>
           <Button variant="outline" onClick={onClose}>
@@ -657,18 +710,34 @@ function EditProfileDialog({
           </Button>
           <Button
             disabled={!target || loading}
-            onClick={() =>
-              target &&
-              onSubmit({
-                user_id: target.id,
-                display_name:
-                  name && name !== target.display_name ? name : undefined,
-                email:
-                  email && email !== target.email && !isProtectedAdmin
-                    ? email
-                    : undefined,
-              })
-            }
+            onClick={() => {
+              if (!target) return;
+              const payload: {
+                user_id: string;
+                display_name?: string;
+                email?: string;
+                siape?: string | null;
+                regime?: RegimeValue | null;
+              } = { user_id: target.id };
+
+              if (name && name !== target.display_name) {
+                payload.display_name = name;
+              }
+              if (email && email !== target.email && !isProtectedAdmin) {
+                payload.email = email;
+              }
+              const trimmedSiape = siape.trim();
+              const currentSiape = target.siape || "";
+              if (trimmedSiape !== currentSiape) {
+                payload.siape = trimmedSiape === "" ? null : trimmedSiape;
+              }
+              const currentRegime = (target.regime as RegimeValue | null) || "";
+              if (regime !== currentRegime) {
+                payload.regime = regime === "" ? null : regime;
+              }
+
+              onSubmit(payload);
+            }}
           >
             {loading ? "Salvando..." : "Salvar"}
           </Button>

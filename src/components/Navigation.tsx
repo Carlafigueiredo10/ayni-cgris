@@ -9,6 +9,9 @@ import {
   BarChart3,
   Settings,
   LogOut,
+  UserCircle,
+  Megaphone,
+  Plane,
 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 
@@ -22,6 +25,8 @@ const Navigation = () => {
     { label: "Agenda", icon: Calendar, href: "/agenda" },
     { label: "Solicitacao", icon: ClipboardList, href: "/solicitacao" },
     { label: "Equipe", icon: Users, href: "/equipe" },
+    { label: "Ferias", icon: Plane, href: "/ferias" },
+    { label: "Comunicados", icon: Megaphone, href: "/comunicados" },
   ];
 
   if (isManager || isManagerCgris || isAdmin) {
@@ -59,6 +64,20 @@ const Navigation = () => {
           );
         })}
       </div>
+
+      <Button
+        variant="ghost"
+        size="sm"
+        className={`text-slate-700 hover:text-primary hover:bg-primary/5 ${
+          location.pathname === "/perfil" ? "bg-primary/5 text-primary" : ""
+        }`}
+        asChild
+      >
+        <a href="/perfil" className="flex items-center gap-1.5">
+          <UserCircle className="h-4 w-4" />
+          <span className="text-sm font-medium hidden md:inline">Perfil</span>
+        </a>
+      </Button>
 
       <Button
         onClick={handleSignOut}

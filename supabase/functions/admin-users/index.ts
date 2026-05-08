@@ -318,12 +318,33 @@ Deno.serve(async (req) => {
         const user_id = body.user_id as string | undefined;
         const display_name = body.display_name as string | undefined;
         const email = (body.email as string | undefined)?.trim().toLowerCase();
+        const siape = body.siape as string | undefined;
+        const regimeRaw = body.regime as string | undefined;
+
         if (!user_id) {
           return jsonResponse({ error: "user_id obrigatorio" }, 400);
         }
-        if (!display_name && !email) {
+
+        const ALLOWED_REGIMES = ["presencial", "remoto", "hibrido"];
+        let regime: string | null | undefined;
+        if (regimeRaw === "" || regimeRaw === null) {
+          regime = null;
+        } else if (regimeRaw === undefined) {
+          regime = undefined;
+        } else if (ALLOWED_REGIMES.includes(regimeRaw)) {
+          regime = regimeRaw;
+        } else {
+          return jsonResponse({ error: "regime invalido" }, 400);
+        }
+
+        if (
+          display_name === undefined &&
+          email === undefined &&
+          siape === undefined &&
+          regime === undefined
+        ) {
           return jsonResponse(
-            { error: "Nada a atualizar (display_name ou email)" },
+            { error: "Nada a atualizar" },
             400,
           );
         }
@@ -348,6 +369,10 @@ Deno.serve(async (req) => {
         const profileUpdates: Record<string, unknown> = {};
         if (display_name) profileUpdates.display_name = display_name;
         if (email) profileUpdates.email = email;
+        if (siape !== undefined) {
+          profileUpdates.siape = siape && siape.trim() !== "" ? siape.trim() : null;
+        }
+        if (regime !== undefined) profileUpdates.regime = regime;
 
         if (email) {
           const { error: e } = await admin.auth.admin.updateUserById(user_id, {
@@ -362,8 +387,10 @@ Deno.serve(async (req) => {
         }
 
         await logAction(user_id, "update_profile", {
-          display_name_changed: !!display_name,
+          display_name_changed: display_name !== undefined,
           email_changed: !!email,
+          siape_changed: siape !== undefined,
+          regime_changed: regime !== undefined,
         });
 
         return jsonResponse({ ok: true });

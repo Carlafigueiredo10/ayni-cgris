@@ -1,34 +1,8 @@
-import { useState } from "react";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { ExternalLink } from "lucide-react";
-import { Comunicado } from "@/lib/comunicado";
-
-const modelos = [
-  { tipo: "Nota Técnica", link: "#" },
-  { tipo: "Ofício", link: "#" },
-  { tipo: "Despacho", link: "#" },
-];
-
-const comunicadosExemplo: Comunicado[] = [
-  {
-    id: "1",
-    titulo: "Novo modelo de despacho disponível",
-    mensagem: "Confira o novo modelo de despacho para processos judiciais.",
-    data: "2025-10-12",
-    autor: "Equipe CGRIS",
-  },
-  {
-    id: "2",
-    titulo: "Atualização nos formulários",
-    mensagem: "Os formulários de controle foram atualizados.",
-    data: "2025-10-10",
-    autor: "Equipe CGRIS",
-  },
-];
 
 export default function Biblioteca() {
-  const [comunicados] = useState<Comunicado[]>(comunicadosExemplo);
   return (
     <div className="max-w-3xl mx-auto py-8 space-y-8">
       <Card>
@@ -53,15 +27,6 @@ export default function Biblioteca() {
           </div>
         </CardContent>
       </Card>
-      <div className="space-y-4 mt-8">
-        {comunicados.map((c) => (
-          <div key={c.id} className="p-3 border rounded-md bg-accent/10">
-            <div className="font-semibold">{c.titulo}</div>
-            <div className="text-sm text-muted-foreground">{c.mensagem}</div>
-            <div className="text-xs mt-1">{c.data} {c.autor && `- ${c.autor}`}</div>
-          </div>
-        ))}
-      </div>
     </div>
   );
 }

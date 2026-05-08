@@ -1,49 +1,86 @@
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
-import { TrendingUp, CheckCircle, Users, Activity, Clock } from "lucide-react";
-import { useCoordinationData } from "@/hooks/use-coordination-data";
+import { Users, FileText, CheckCircle, AlertTriangle } from "lucide-react";
+import {
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  Tooltip,
+  ResponsiveContainer,
+  CartesianGrid,
+  Legend,
+} from "recharts";
+import { useCgrisOverview } from "@/hooks/use-cgris-overview";
 import DiagonalLines from "@/components/ui/diagonal-lines";
+import { format, parseISO } from "date-fns";
+import { ptBR } from "date-fns/locale";
 
 const EmNumeros = () => {
-  const { teamSummary, personalStats, loading } = useCoordinationData();
+  const { overview, history, loading } = useCgrisOverview();
 
-  const ts = teamSummary;
+  const mesLabel = overview?.mes
+    ? format(parseISO(overview.mes), "MMMM 'de' yyyy", { locale: ptBR })
+    : "—";
+
+  const historicoChart = history.map((h) => ({
+    mes: format(parseISO(h.mes), "MMM/yy", { locale: ptBR }),
+    processos: h.total_processos,
+    concluidos: h.total_concluidos,
+    reincidencias: h.qtd_reincidencias,
+  }));
 
   return (
     <div className="space-y-8">
       <div>
-        <h1 className="text-2xl font-bold text-foreground">
-          CGRIS em Numeros
-        </h1>
-        <p className="text-muted-foreground mt-1">
-          Indicadores agregados da sua coordenacao — mes atual
+        <h1 className="text-2xl font-bold text-foreground">CGRIS em Numeros</h1>
+        <p className="text-muted-foreground mt-1 capitalize">
+          Indicadores agregados — {mesLabel}
         </p>
       </div>
 
       {loading ? (
         <p className="text-muted-foreground">Carregando dados...</p>
-      ) : !ts ? (
+      ) : !overview ? (
         <Card className="border-dashed">
           <CardContent className="py-12 text-center">
             <p className="text-muted-foreground">
-              Sem dados da equipe para o mes atual.
+              Sem dados consolidados para o mes atual.
             </p>
           </CardContent>
         </Card>
       ) : (
         <>
-          {/* KPIs da equipe */}
+          {/* KPIs principais */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             <Card className="relative overflow-hidden">
               <DiagonalLines />
               <CardHeader className="relative flex flex-row items-center gap-2 pb-2">
-                <TrendingUp className="h-5 w-5 text-primary" />
+                <Users className="h-5 w-5 text-primary" />
                 <CardTitle className="text-sm font-medium text-muted-foreground">
-                  Total de processos
+                  Servidores ativos no mes
                 </CardTitle>
               </CardHeader>
               <CardContent className="relative">
                 <p className="text-3xl font-bold text-foreground">
-                  {ts.total_processos}
+                  {overview.total_servidores_no_mes}
+                </p>
+                <p className="text-xs text-muted-foreground mt-1">
+                  de {overview.total_servidores_cadastrados} cadastrados
+                </p>
+              </CardContent>
+            </Card>
+
+            <Card className="relative overflow-hidden">
+              <DiagonalLines />
+              <CardHeader className="relative flex flex-row items-center gap-2 pb-2">
+                <FileText className="h-5 w-5 text-primary" />
+                <CardTitle className="text-sm font-medium text-muted-foreground">
+                  Processos trabalhados
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="relative">
+                <p className="text-3xl font-bold text-foreground">
+                  {overview.total_processos}
                 </p>
               </CardContent>
             </Card>
@@ -58,7 +95,15 @@ const EmNumeros = () => {
               </CardHeader>
               <CardContent className="relative">
                 <p className="text-3xl font-bold text-foreground">
-                  {ts.qtd_concluidos}
+                  {overview.total_concluidos}
+                </p>
+                <p className="text-xs text-muted-foreground mt-1">
+                  {overview.total_processos > 0
+                    ? Math.round(
+                        (overview.total_concluidos / overview.total_processos) *
+                          100
+                      ) + "% do total"
+                    : "—"}
                 </p>
               </CardContent>
             </Card>
@@ -66,76 +111,157 @@ const EmNumeros = () => {
             <Card className="relative overflow-hidden">
               <DiagonalLines />
               <CardHeader className="relative flex flex-row items-center gap-2 pb-2">
-                <Clock className="h-5 w-5 text-primary" />
+                <AlertTriangle className="h-5 w-5 text-primary" />
                 <CardTitle className="text-sm font-medium text-muted-foreground">
-                  Media por processo
+                  Taxa de reincidencia
                 </CardTitle>
               </CardHeader>
               <CardContent className="relative">
                 <p className="text-3xl font-bold text-foreground">
-                  {ts.media_minutos != null ? ts.media_minutos + " min" : "N/D"}
+                  {overview.taxa_reincidencia_pct != null
+                    ? overview.taxa_reincidencia_pct + "%"
+                    : "—"}
                 </p>
-                <p className="text-xs text-muted-foreground">
-                  {ts.media_minutos == null && "menos de 3 servidores ativos"}
-                </p>
-              </CardContent>
-            </Card>
-
-            <Card className="relative overflow-hidden">
-              <DiagonalLines />
-              <CardHeader className="relative flex flex-row items-center gap-2 pb-2">
-                <Activity className="h-5 w-5 text-primary" />
-                <CardTitle className="text-sm font-medium text-muted-foreground">
-                  Distribuicao
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="relative">
-                <p className="text-lg font-bold text-foreground">
-                  {ts.qtd_judicial} judicial
-                </p>
-                <p className="text-lg font-bold text-foreground">
-                  {ts.qtd_controle} controle
+                <p className="text-xs text-muted-foreground mt-1">
+                  {overview.qtd_reincidencias} casos
                 </p>
               </CardContent>
             </Card>
           </div>
 
-          {/* Comparacao pessoal vs equipe */}
-          <Card>
-            <CardHeader className="pb-2">
-              <CardTitle className="text-base">
-                Seu desempenho vs coordenacao
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div>
-                  <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
-                    Seus processos
+          {/* Distribuicoes */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <Card>
+              <CardHeader className="pb-2">
+                <CardTitle className="text-base">Por natureza</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <ul className="space-y-2 text-sm">
+                  <li className="flex items-center justify-between">
+                    <span className="flex items-center gap-2">
+                      <span className="h-2 w-2 rounded-full bg-primary"></span>
+                      Judicial
+                    </span>
+                    <span className="font-semibold tabular-nums">
+                      {overview.qtd_judicial}
+                    </span>
+                  </li>
+                  <li className="flex items-center justify-between">
+                    <span className="flex items-center gap-2">
+                      <span className="h-2 w-2 rounded-full bg-accent"></span>
+                      Controle
+                    </span>
+                    <span className="font-semibold tabular-nums">
+                      {overview.qtd_controle}
+                    </span>
+                  </li>
+                  <li className="flex items-center justify-between">
+                    <span className="flex items-center gap-2">
+                      <span className="h-2 w-2 rounded-full bg-muted-foreground"></span>
+                      Atos
+                    </span>
+                    <span className="font-semibold tabular-nums">
+                      {overview.qtd_atos}
+                    </span>
+                  </li>
+                </ul>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader className="pb-2">
+                <CardTitle className="text-base">Por coordenacao</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <ul className="space-y-2 text-sm">
+                  <li className="flex items-center justify-between">
+                    <span className="flex items-center gap-2">
+                      <span className="h-2 w-2 rounded-full bg-primary"></span>
+                      COCON
+                    </span>
+                    <span className="font-semibold tabular-nums">
+                      {overview.cocon_visivel
+                        ? overview.cocon_processos
+                        : "—"}
+                    </span>
+                  </li>
+                  <li className="flex items-center justify-between">
+                    <span className="flex items-center gap-2">
+                      <span className="h-2 w-2 rounded-full bg-accent"></span>
+                      CODEJ
+                    </span>
+                    <span className="font-semibold tabular-nums">
+                      {overview.codej_visivel
+                        ? overview.codej_processos
+                        : "—"}
+                    </span>
+                  </li>
+                  <li className="flex items-center justify-between">
+                    <span className="flex items-center gap-2">
+                      <span className="h-2 w-2 rounded-full bg-muted-foreground"></span>
+                      NATOS
+                    </span>
+                    <span className="font-semibold tabular-nums">
+                      {overview.natos_visivel
+                        ? overview.natos_processos
+                        : "—"}
+                    </span>
+                  </li>
+                </ul>
+                {(!overview.cocon_visivel ||
+                  !overview.codej_visivel ||
+                  !overview.natos_visivel) && (
+                  <p className="text-xs text-muted-foreground mt-3">
+                    "—" indica coordenacao com menos de 3 servidores ativos no
+                    periodo (privacidade).
                   </p>
-                  <p className="text-2xl font-bold mt-1">
-                    {personalStats.total}
-                  </p>
-                </div>
-                <div>
-                  <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
-                    Sua media
-                  </p>
-                  <p className="text-2xl font-bold mt-1">
-                    {personalStats.media} min
-                  </p>
-                </div>
-                <div>
-                  <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
-                    Media da coordenacao
-                  </p>
-                  <p className="text-2xl font-bold mt-1">
-                    {ts.media_minutos != null ? ts.media_minutos + " min" : "N/D"}
-                  </p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+                )}
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Evolucao mensal */}
+          {historicoChart.length > 1 && (
+            <Card>
+              <CardHeader className="pb-2">
+                <CardTitle className="text-base">
+                  Evolucao mensal (ultimos 6 meses)
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="h-[260px]">
+                <ResponsiveContainer width="100%" height="100%">
+                  <LineChart data={historicoChart}>
+                    <CartesianGrid strokeDasharray="3 3" opacity={0.3} />
+                    <XAxis dataKey="mes" tick={{ fontSize: 11 }} />
+                    <YAxis tick={{ fontSize: 11 }} />
+                    <Tooltip />
+                    <Legend wrapperStyle={{ fontSize: 12 }} />
+                    <Line
+                      type="monotone"
+                      dataKey="processos"
+                      stroke="hsl(var(--primary))"
+                      name="Processos"
+                      strokeWidth={2}
+                    />
+                    <Line
+                      type="monotone"
+                      dataKey="concluidos"
+                      stroke="hsl(var(--accent))"
+                      name="Concluidos"
+                      strokeWidth={2}
+                    />
+                    <Line
+                      type="monotone"
+                      dataKey="reincidencias"
+                      stroke="hsl(var(--destructive))"
+                      name="Reincidencias"
+                      strokeWidth={2}
+                    />
+                  </LineChart>
+                </ResponsiveContainer>
+              </CardContent>
+            </Card>
+          )}
         </>
       )}
     </div>

@@ -1,6 +1,10 @@
 import { useState, useEffect, useCallback } from "react";
 import { supabase } from "@/lib/supabase";
 import { toast } from "sonner";
+import type { Regime } from "@/contexts/AuthContext";
+import type { ServidorInput } from "@/hooks/use-servidores";
+
+export type { ServidorInput };
 
 export type ServidorAdmin = {
   id: string;
@@ -9,17 +13,7 @@ export type ServidorAdmin = {
   email: string | null;
   team_id: string | null;
   team_code: string | null;
-  presencial: boolean;
-  ativo: boolean;
-};
-
-export type ServidorInput = {
-  id?: string | null;
-  nome: string;
-  siape: string;
-  email: string;
-  team_code: string;
-  presencial: boolean;
+  regime: Regime | null;
   ativo: boolean;
 };
 
@@ -29,7 +23,7 @@ type ServidorRow = {
   siape: string | null;
   email: string | null;
   team_id: string | null;
-  presencial: boolean;
+  regime: Regime | null;
   ativo: boolean;
   teams: { code: string } | null;
 };
@@ -42,7 +36,7 @@ export function useServidoresAdmin() {
     setLoading(true);
     const { data, error } = await supabase
       .from("servidores")
-      .select("id, nome, siape, email, team_id, presencial, ativo, teams(code)")
+      .select("id, nome, siape, email, team_id, regime, ativo, teams(code)")
       .order("nome");
 
     if (error) {
@@ -58,7 +52,7 @@ export function useServidoresAdmin() {
       email: s.email,
       team_id: s.team_id,
       team_code: s.teams?.code ?? null,
-      presencial: s.presencial,
+      regime: s.regime,
       ativo: s.ativo,
     }));
 
@@ -78,7 +72,7 @@ export function useServidoresAdmin() {
         p_siape: input.siape,
         p_email: input.email,
         p_team_code: input.team_code,
-        p_presencial: input.presencial,
+        p_regime: input.regime || null,
         p_ativo: input.ativo,
       });
 
