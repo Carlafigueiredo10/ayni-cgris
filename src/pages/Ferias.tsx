@@ -227,12 +227,12 @@ export default function Ferias() {
         <TabsContent value="minhas" className="space-y-4 pt-4">
           <div className="flex items-center justify-between gap-3">
             <p className="text-sm text-muted-foreground">
-              Suas solicitações. Edição livre enquanto estiver Pendente ou em
+              Seus cadastros. Edição livre enquanto estiver Pendente ou em
               Ajuste.
             </p>
             <Button onClick={abrirSolicitar} size="sm">
               <Plus className="mr-1.5 h-4 w-4" />
-              Solicitar férias
+              Cadastrar férias
             </Button>
           </div>
 
@@ -359,7 +359,7 @@ export default function Ferias() {
         <DialogContent>
           <DialogHeader>
             <DialogTitle>
-              {editando ? "Editar férias" : "Solicitar férias"}
+              {editando ? "Editar férias" : "Cadastrar férias"}
             </DialogTitle>
             <DialogDescription>
               {editando
@@ -420,7 +420,7 @@ export default function Ferias() {
                 ? "Salvando..."
                 : editando
                 ? "Salvar"
-                : "Solicitar"}
+                : "Cadastrar"}
             </Button>
           </DialogFooter>
         </DialogContent>
