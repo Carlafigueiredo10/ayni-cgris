@@ -4,6 +4,10 @@
 --    avisar que um processo concluido esta sendo reaberto.
 -- 2. check_cpf_history: lista processos previos da equipe associados ao mesmo
 --    CPF, para alertar batimento (especialmente em controle).
+--
+-- DROP necessario: check_reincidence ja existe com return type diferente.
+
+DROP FUNCTION IF EXISTS public.check_reincidence(TEXT);
 
 CREATE OR REPLACE FUNCTION public.check_reincidence(p_processo TEXT)
 RETURNS TABLE (

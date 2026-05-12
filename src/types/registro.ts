@@ -22,7 +22,7 @@ export type Registro = {
   multaDestinatario?: string;
   multaPeriodicidade?: string;
   multaFaixa?: string;
-  encaminhadoPara?: string;
+  encaminhadoPara?: string[];
   encaminhadoParaOutros?: string;
   trilha?: string;
   acaoColetivaFaixa?: string;
@@ -83,6 +83,12 @@ export type ReincidenciaResult = {
   different_server_count: number;
   last_status: string | null;
   already_concluded: boolean;
+};
+
+export type ProcessoLastJudicial = {
+  tipo_processo: string | null;
+  assunto_judicial: string | null;
+  assunto_judicial_outros: string | null;
 };
 
 export type CpfHistoryResult = {

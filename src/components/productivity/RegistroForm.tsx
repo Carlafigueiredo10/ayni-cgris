@@ -13,8 +13,13 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { ChevronDown, Plus, HelpCircle } from "lucide-react";
-import type { Registro, CpfHistoryResult } from "@/types/registro";
+import type {
+  Registro,
+  CpfHistoryResult,
+  ProcessoLastJudicial,
+} from "@/types/registro";
 import { formatCpf, isValidCpf, onlyDigits } from "@/lib/cpf";
+import { formatSei, isValidSei } from "@/lib/sei";
 import {
   getAssuntosByTipo,
   FAIXAS_MULTA,
@@ -37,15 +42,13 @@ const EMPTY: Registro = {
   tipoAto: "",
   subtipoAto: "",
   cpf: "",
-  classificacao: "",
-  acordaoTcuTipo: "",
   assuntoJudicial: "",
   assuntoJudicialOutros: "",
   multa: false,
   multaDestinatario: "",
   multaPeriodicidade: "",
   multaFaixa: "",
-  encaminhadoPara: "",
+  encaminhadoPara: [],
   encaminhadoParaOutros: "",
   trilha: "",
   acaoColetivaFaixa: "",
@@ -93,20 +96,28 @@ type Props = {
   onSubmit: (registro: Registro) => void;
   submitting?: boolean;
   onCpfCheck?: (cpf: string) => Promise<CpfHistoryResult | null>;
+  onProcessoLookup?: (
+    processo: string
+  ) => Promise<ProcessoLastJudicial | null>;
 };
 
 export default function RegistroForm({
   onSubmit,
   submitting,
   onCpfCheck,
+  onProcessoLookup,
 }: Props) {
   const [open, setOpen] = useState(true);
   const [novo, setNovo] = useState<Registro>({ ...EMPTY });
   const [cpfHistory, setCpfHistory] = useState<CpfHistoryResult | null>(null);
+  const [assuntoSugerido, setAssuntoSugerido] = useState<boolean>(false);
 
   const cpfDigits = onlyDigits(novo.cpf ?? "");
   const cpfTouched = cpfDigits.length > 0;
   const cpfValid = cpfDigits.length === 0 || isValidCpf(cpfDigits);
+
+  const processoTouched = (novo.processo ?? "").length > 0;
+  const processoValid = isValidSei(novo.processo ?? "");
 
   useEffect(() => {
     if (!onCpfCheck || cpfDigits.length !== 11 || !cpfValid) {
@@ -127,9 +138,11 @@ export default function RegistroForm({
   const handleSubmit = () => {
     if (!novo.data || !novo.processo || !novo.minutos) return;
     if (cpfTouched && !cpfValid) return;
+    if (!processoValid) return;
     onSubmit({ ...novo, cpf: cpfDigits || undefined });
     setNovo({ ...EMPTY });
     setCpfHistory(null);
+    setAssuntoSugerido(false);
   };
 
   return (
@@ -165,8 +178,6 @@ export default function RegistroForm({
                   tipoControle: "",
                   tipoAto: "",
                   subtipoAto: "",
-                  classificacao: "",
-                  acordaoTcuTipo: "",
                   assuntoJudicial: "",
                   assuntoJudicialOutros: "",
                   multa: false,
@@ -277,10 +288,48 @@ export default function RegistroForm({
           <div className="sm:col-span-2">
             <Label>Numero do processo ou indicio</Label>
             <Input
-              placeholder="Ex: 19975.000000/2025-11"
-              value={novo.processo}
-              onChange={(e) => setNovo({ ...novo, processo: e.target.value })}
+              inputMode="numeric"
+              placeholder="00000.000000/0000-00"
+              value={formatSei(novo.processo ?? "")}
+              maxLength={20}
+              aria-invalid={processoTouched && !processoValid}
+              className={
+                processoTouched && !processoValid ? "border-destructive" : ""
+              }
+              onChange={(e) =>
+                setNovo({ ...novo, processo: formatSei(e.target.value) })
+              }
+              onBlur={async () => {
+                if (
+                  !onProcessoLookup ||
+                  !novo.processo ||
+                  !processoValid ||
+                  novo.tipoNatureza !== "judicial" ||
+                  novo.assuntoJudicial
+                ) {
+                  return;
+                }
+                const hist = await onProcessoLookup(novo.processo);
+                if (!hist || !hist.assunto_judicial) return;
+                setNovo((prev) => ({
+                  ...prev,
+                  tipoProcesso: prev.tipoProcesso || hist.tipo_processo || "",
+                  assuntoJudicial:
+                    prev.assuntoJudicial || hist.assunto_judicial || "",
+                  assuntoJudicialOutros:
+                    prev.assuntoJudicialOutros ||
+                    hist.assunto_judicial_outros ||
+                    "",
+                }));
+                setAssuntoSugerido(true);
+              }}
             />
+            {processoTouched && !processoValid && (
+              <p className="text-xs text-destructive mt-1">
+                Número incompleto. Formato SEI: 00000.000000/0000-00 (17
+                dígitos).
+              </p>
+            )}
           </div>
 
           <div className="sm:col-span-2">
@@ -321,7 +370,7 @@ export default function RegistroForm({
                 setNovo({
                   ...novo,
                   status: v,
-                  encaminhadoPara: v === "Encaminhado" ? novo.encaminhadoPara : "",
+                  encaminhadoPara: v === "Encaminhado" ? novo.encaminhadoPara : [],
                   encaminhadoParaOutros:
                     v === "Encaminhado" ? novo.encaminhadoParaOutros : "",
                 });
@@ -472,32 +521,44 @@ export default function RegistroForm({
             <div className="sm:col-span-4 grid gap-4 sm:grid-cols-2 p-4 border rounded-md bg-muted/20">
               <div>
                 <Label>Encaminhado para</Label>
-                <select
-                  value={novo.encaminhadoPara}
-                  onChange={(e) =>
-                    setNovo({
-                      ...novo,
-                      encaminhadoPara: e.target.value,
-                      encaminhadoParaOutros:
-                        e.target.value === "outros"
-                          ? novo.encaminhadoParaOutros
-                          : "",
-                    })
-                  }
-                  className="w-full border rounded-md h-10 px-3 bg-background text-sm"
-                >
-                  <option value="">Selecione</option>
+                <p className="text-xs text-muted-foreground mb-1.5">
+                  Marque uma ou mais áreas
+                </p>
+                <div className="flex flex-wrap gap-x-4 gap-y-2 border rounded-md p-3 bg-background">
                   {(novo.tipoNatureza === "atos"
                     ? AREAS_ENCAMINHAMENTO_ATOS
                     : AREAS_ENCAMINHAMENTO
-                  ).map((a) => (
-                    <option key={a.v} value={a.v}>
-                      {a.l}
-                    </option>
-                  ))}
-                </select>
+                  ).map((a) => {
+                    const checked = novo.encaminhadoPara?.includes(a.v) || false;
+                    return (
+                      <label
+                        key={a.v}
+                        className="flex items-center gap-1.5 text-sm"
+                      >
+                        <input
+                          type="checkbox"
+                          checked={checked}
+                          onChange={(e) => {
+                            const arr = novo.encaminhadoPara || [];
+                            const next = e.target.checked
+                              ? [...arr, a.v]
+                              : arr.filter((v) => v !== a.v);
+                            setNovo({
+                              ...novo,
+                              encaminhadoPara: next,
+                              encaminhadoParaOutros: next.includes("outros")
+                                ? novo.encaminhadoParaOutros
+                                : "",
+                            });
+                          }}
+                        />
+                        {a.l}
+                      </label>
+                    );
+                  })}
+                </div>
               </div>
-              {novo.encaminhadoPara === "outros" && (
+              {novo.encaminhadoPara?.includes("outros") && (
                 <div>
                   <Label>Descreva a área</Label>
                   <Input
@@ -518,47 +579,9 @@ export default function RegistroForm({
             <div className="sm:col-span-4 space-y-4 p-4 border rounded-md bg-muted/20">
               <h4 className="text-sm font-semibold">Detalhes judiciais</h4>
 
-              <div className="grid gap-4 sm:grid-cols-3">
-                <div>
-                  <Label>Classificação</Label>
-                  <select
-                    value={novo.classificacao}
-                    onChange={(e) =>
-                      setNovo({
-                        ...novo,
-                        classificacao: e.target.value,
-                        acordaoTcuTipo: "",
-                      })
-                    }
-                    className="w-full border rounded-md h-10 px-3 bg-background text-sm"
-                  >
-                    <option value="">Selecione</option>
-                    <option value="acordao_tcu">Acórdão (TCU)</option>
-                    <option value="diligencia">Diligência</option>
-                    <option value="indicio">Indício</option>
-                  </select>
-                </div>
-
-                {novo.classificacao === "acordao_tcu" && (
-                  <div>
-                    <Label>Tipo do Acórdão</Label>
-                    <select
-                      value={novo.acordaoTcuTipo}
-                      onChange={(e) =>
-                        setNovo({ ...novo, acordaoTcuTipo: e.target.value })
-                      }
-                      className="w-full border rounded-md h-10 px-3 bg-background text-sm"
-                    >
-                      <option value="">Selecione</option>
-                      <option value="oitiva">Oitiva</option>
-                      <option value="responsabilizacao">Responsabilização</option>
-                    </select>
-                  </div>
-                )}
-              </div>
-
               {(novo.tipoProcesso === "subsidio" ||
-                novo.tipoProcesso === "cumprimento") && (
+                novo.tipoProcesso === "cumprimento" ||
+                novo.tipoProcesso === "administrativo") && (
                 <div className="grid gap-4 sm:grid-cols-2">
                   <div>
                     <Label>Assunto</Label>
@@ -574,6 +597,7 @@ export default function RegistroForm({
                         ) {
                           return;
                         }
+                        setAssuntoSugerido(false);
                         setNovo({
                           ...novo,
                           assuntoJudicial: v,
@@ -590,6 +614,12 @@ export default function RegistroForm({
                         </option>
                       ))}
                     </select>
+                    {assuntoSugerido && novo.assuntoJudicial && (
+                      <p className="text-xs text-muted-foreground mt-1">
+                        Pré-preenchido pelo histórico deste processo. Pode
+                        trocar se for outro assunto.
+                      </p>
+                    )}
                   </div>
 
                   {novo.assuntoJudicial === "outros" && (
@@ -751,6 +781,7 @@ export default function RegistroForm({
             !novo.processo ||
             !novo.minutos ||
             (cpfTouched && !cpfValid) ||
+            !processoValid ||
             submitting
           }
           className="gap-2"

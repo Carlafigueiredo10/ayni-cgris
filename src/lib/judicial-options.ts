@@ -2,28 +2,77 @@
 
 export type Option = { v: string; l: string };
 
-// Assunto judicial - lista distinta por tipo de processo
-export const ASSUNTOS_SUBSIDIO: Option[] = [
-  { v: "gratificacao_desempenho", l: "Gratificação de desempenho" },
-  { v: "auxilio_alimentacao", l: "Auxílio-alimentação" },
-  { v: "incorporacao_funcao", l: "Incorporação de função" },
-  { v: "progressao_funcional", l: "Progressão funcional" },
-  { v: "anistia", l: "Anistia" },
+// Assunto judicial - lista distinta por tipo de processo (CGRIS, abr/2026)
+// Subsídio e Cumprimento compartilham a mesma lista (abas ESUB/ECUMP da planilha)
+export const ASSUNTOS_SUB_CUMP: Option[] = [
+  { v: "abate_teto", l: "Abate Teto" },
+  { v: "acumulacao_cargos", l: "Acumulação de Cargos" },
+  { v: "alvara_judicial", l: "Alvará Judicial" },
+  { v: "anistiado", l: "Anistiado" },
+  { v: "aposentadoria_cassacao", l: "Aposentadoria - Cassação" },
+  { v: "aposentadoria_concessao", l: "Aposentadoria - Concessão" },
+  { v: "aposentadoria_restabelecimento", l: "Aposentadoria - Restabelecimento de Proventos" },
+  { v: "aposentadoria_revisao", l: "Aposentadoria - Revisão" },
+  { v: "ats_anuenio", l: "ATS/Anuênio" },
+  { v: "auxilio_moradia", l: "Auxílio Moradia" },
+  { v: "averbacao_tempo_contribuicao", l: "Averbação de Tempo de Contribuição" },
+  { v: "bonus_eficiencia", l: "Bônus de Eficiência" },
+  { v: "certidao_tempo_contribuicao", l: "Certidão de Tempo de Contribuição" },
+  { v: "concessao_gratificacao", l: "Concessão de Gratificação" },
+  { v: "contagem_tempo_especial", l: "Contagem de Tempo Especial" },
+  { v: "curatela", l: "Curatela" },
+  { v: "danos_morais", l: "Danos Morais" },
+  { v: "desconto_folha_penhora", l: "Desconto em Folha - Penhora" },
+  { v: "diaria_asilado", l: "Diária de Asilado" },
+  { v: "diferenca_soldo", l: "Diferença de Soldo" },
+  { v: "gratificacao_desempenho_diferenca", l: "Gratificação de Desempenho - Diferença" },
+  { v: "gratificacao_titulacao_rsc", l: "Gratificação por Titulação - RSC" },
+  { v: "informacoes_cadastrais", l: "Informações Cadastrais" },
+  { v: "informacoes_financeiras", l: "Informações Financeiras" },
+  { v: "inventario", l: "Inventário" },
+  { v: "irpf", l: "IRPF" },
+  { v: "pec_dnit", l: "PEC-DNIT" },
+  { v: "pensao_retroativos", l: "Pensão - Retroativos (Exercícios Anteriores)" },
+  { v: "pensao_alimenticia", l: "Pensão Alimentícia" },
+  { v: "pensao_civil_concessao", l: "Pensão Civil - Concessão" },
+  { v: "pensao_civil_restabelecimento", l: "Pensão Civil - Restabelecimento" },
+  { v: "pensao_civil_revisao", l: "Pensão Civil - Revisão" },
+  { v: "percentual_28_86", l: "Percentual de 28,86%" },
+  { v: "percentual_3_17", l: "Percentual de 3,17%" },
+  { v: "quintos", l: "Quintos" },
+  { v: "reenquadramento_funcional", l: "Reenquadramento Funcional" },
+  { v: "reposicao_erario", l: "Reposição ao Erário" },
+  { v: "residuos_remuneratorios", l: "Resíduos Remuneratórios" },
+  { v: "rgps", l: "RGPS" },
+  { v: "transposicao", l: "Transposição" },
+  { v: "vpe", l: "VPE" },
+  { v: "vpni", l: "VPNI" },
+  { v: "consulta_orgao_controle", l: "Consulta Decorrente de Órgão de Controle" },
+  { v: "cadastro_aj", l: "Cadastro AJ" },
+  { v: "vinculo_nao_decipex", l: "Vínculo não é com a Decipex" },
+  { v: "tema_nao_decipex", l: "Tema não é da Decipex" },
   { v: "outros", l: "Outros (descrever)" },
 ];
 
-export const ASSUNTOS_CUMPRIMENTO: Option[] = [
-  { v: "implantacao_rubrica", l: "Implantação de rubrica" },
-  { v: "exclusao_rubrica", l: "Exclusão de rubrica" },
-  { v: "pagamento_atrasados", l: "Pagamento de atrasados" },
-  { v: "revisao_proventos", l: "Revisão de proventos" },
-  { v: "restituicao", l: "Restituição ao erário" },
+// Aba EADM da planilha (tipo de processo Administrativo)
+export const ASSUNTOS_ADMINISTRATIVO: Option[] = [
+  { v: "reposicao_erario", l: "Reposição ao Erário" },
+  { v: "rgps", l: "RGPS" },
+  { v: "vpe", l: "VPE" },
+  { v: "cumprimento_decisao_judicial", l: "Cumprimento de Decisão Judicial" },
+  { v: "extensao_rubrica", l: "Extensão de Rubrica" },
+  { v: "descontos_indevidos", l: "Descontos indevidos" },
+  { v: "revisao_pensao", l: "Revisão de Pensão" },
+  { v: "revisao_aposentadoria", l: "Revisão de Aposentadoria" },
+  { v: "vinculo_nao_decipex", l: "Vínculo não é com a Decipex" },
+  { v: "tema_nao_decipex", l: "Tema não é da Decipex" },
   { v: "outros", l: "Outros (descrever)" },
 ];
 
 export function getAssuntosByTipo(tipoProcesso?: string): Option[] {
-  if (tipoProcesso === "subsidio") return ASSUNTOS_SUBSIDIO;
-  if (tipoProcesso === "cumprimento") return ASSUNTOS_CUMPRIMENTO;
+  if (tipoProcesso === "subsidio" || tipoProcesso === "cumprimento")
+    return ASSUNTOS_SUB_CUMP;
+  if (tipoProcesso === "administrativo") return ASSUNTOS_ADMINISTRATIVO;
   return [];
 }
 
@@ -43,6 +92,8 @@ export const AREAS_ENCAMINHAMENTO: Option[] = [
   { v: "digep", l: "DIGEP" },
   { v: "cgben", l: "CGBEN" },
   { v: "cgpag", l: "CGPAG" },
+  { v: "coate", l: "COATE" },
+  { v: "cggaf", l: "CGGAF" },
   { v: "outros", l: "Outros (descrever)" },
 ];
 

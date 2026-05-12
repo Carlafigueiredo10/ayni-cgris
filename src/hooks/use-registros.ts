@@ -6,6 +6,7 @@ import type {
   RegistroDB,
   ReincidenciaResult,
   CpfHistoryResult,
+  ProcessoLastJudicial,
 } from "@/types/registro";
 import { toast } from "sonner";
 
@@ -34,7 +35,9 @@ function dbToRegistro(r: RegistroDB): Registro {
     multaDestinatario: r.multa_destinatario ?? undefined,
     multaPeriodicidade: r.multa_periodicidade ?? undefined,
     multaFaixa: r.multa_faixa ?? undefined,
-    encaminhadoPara: r.encaminhado_para ?? undefined,
+    encaminhadoPara: r.encaminhado_para
+      ? r.encaminhado_para.split(",").map((s) => s.trim()).filter(Boolean)
+      : undefined,
     encaminhadoParaOutros: r.encaminhado_para_outros ?? undefined,
     trilha: r.trilha ?? undefined,
     acaoColetivaFaixa: r.acao_coletiva_faixa ?? undefined,
@@ -92,6 +95,21 @@ export function useRegistros() {
     []
   );
 
+  const getProcessoLastJudicial = useCallback(
+    async (processo: string): Promise<ProcessoLastJudicial | null> => {
+      if (!processo || processo.trim().length === 0) return null;
+      const { data, error } = await supabase.rpc("get_processo_last_judicial", {
+        p_processo: processo.trim(),
+      });
+      if (error) {
+        console.error("Erro ao buscar histórico de assunto:", error);
+        return null;
+      }
+      return data?.[0] ?? null;
+    },
+    []
+  );
+
   const checkCpfHistory = useCallback(
     async (cpf: string): Promise<CpfHistoryResult | null> => {
       if (!cpf || cpf.length === 0) return null;
@@ -138,7 +156,10 @@ export function useRegistros() {
         multa_destinatario: novo.multaDestinatario,
         multa_periodicidade: novo.multaPeriodicidade,
         multa_faixa: novo.multaFaixa,
-        encaminhado_para: novo.encaminhadoPara,
+        encaminhado_para:
+          novo.encaminhadoPara && novo.encaminhadoPara.length > 0
+            ? novo.encaminhadoPara.join(",")
+            : null,
         encaminhado_para_outros: novo.encaminhadoParaOutros,
         trilha: novo.trilha,
         acao_coletiva_faixa: novo.acaoColetivaFaixa,
@@ -178,6 +199,7 @@ export function useRegistros() {
     fetchRegistros,
     checkReincidence,
     checkCpfHistory,
+    getProcessoLastJudicial,
     addRegistro,
   };
 }

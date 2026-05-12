@@ -17,8 +17,14 @@ import { useMyScore } from "@/hooks/use-my-score";
 import { MeuPainelNav } from "@/components/meu-painel/MeuPainelNav";
 
 const Productivity = () => {
-  const { registros, stats, checkReincidence, checkCpfHistory, addRegistro } =
-    useRegistros();
+  const {
+    registros,
+    stats,
+    checkReincidence,
+    checkCpfHistory,
+    getProcessoLastJudicial,
+    addRegistro,
+  } = useRegistros();
   const { coordinationKpis, loading: coordLoading } = useCoordinationData();
   const {
     total: pontosTotal,
@@ -117,6 +123,7 @@ const Productivity = () => {
             onSubmit={handleSubmit}
             submitting={submitting}
             onCpfCheck={checkCpfHistory}
+            onProcessoLookup={getProcessoLastJudicial}
           />
         </CardContent>
       </Card>
