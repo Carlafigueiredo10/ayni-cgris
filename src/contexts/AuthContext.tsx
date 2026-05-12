@@ -104,13 +104,15 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   useEffect(() => {
     let mounted = true;
 
-    // Fallback extremo: se bootstrap não terminar em 10s, registra erro e libera UI.
+    // Fallback extremo: alinhado com loadProfileSafe (8s × 2 tentativas + margem).
+    // Antes era 10s e disparava ANTES do profile chegar em cold start, forçando
+    // guards a verem profile=null e redirecionarem admin_global pra fora.
     const fallback = setTimeout(() => {
       if (mounted && loading) {
-        console.error("[Auth] bootstrap timeout — sem sessão resolvida em 10s");
+        console.error("[Auth] bootstrap timeout — sem sessão resolvida em 20s");
         setLoading(false);
       }
-    }, 10000);
+    }, 20000);
 
     async function bootstrap() {
       try {

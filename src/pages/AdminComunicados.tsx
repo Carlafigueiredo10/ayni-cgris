@@ -35,7 +35,7 @@ import { ArrowLeft, Plus, Megaphone, ExternalLink, Pencil, Trash2 } from "lucide
 const DEFAULT_AUTOR = "Produtividade, Dados e Comunicação/CGRIS";
 
 export default function AdminComunicados() {
-  const { isAdmin, loading: authLoading } = useAuth();
+  const { isAdmin, profile, loading: authLoading } = useAuth();
   const { comunicados, loading, save, remove } = useComunicados();
 
   const [modalOpen, setModalOpen] = useState(false);
@@ -50,6 +50,7 @@ export default function AdminComunicados() {
   }, [comunicados]);
 
   if (authLoading) return null;
+  if (profile === null) return null;
   if (!isAdmin) return <Navigate to="/comunicados" replace />;
 
   const handleAdd = () => {

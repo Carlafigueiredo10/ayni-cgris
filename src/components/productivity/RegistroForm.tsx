@@ -27,6 +27,8 @@ import {
   AREAS_ENCAMINHAMENTO_ATOS,
   FAIXAS_ACAO_COLETIVA,
   FAIXAS_LOTE_INDICIOS,
+  FASES_CONTROLE,
+  TRILHAS,
 } from "@/lib/judicial-options";
 
 const EMPTY: Registro = {
@@ -39,6 +41,7 @@ const EMPTY: Registro = {
   tipoNatureza: "",
   tipoProcesso: "",
   tipoControle: "",
+  fase: "",
   tipoAto: "",
   subtipoAto: "",
   cpf: "",
@@ -119,6 +122,13 @@ export default function RegistroForm({
   const processoTouched = (novo.processo ?? "").length > 0;
   const processoValid = isValidSei(novo.processo ?? "");
 
+  const isControle = novo.tipoNatureza === "controle";
+  const controleValid =
+    !isControle ||
+    (!!novo.fase &&
+      !!novo.trilha &&
+      TRILHAS.some((t) => t.l === novo.trilha));
+
   useEffect(() => {
     if (!onCpfCheck || cpfDigits.length !== 11 || !cpfValid) {
       setCpfHistory(null);
@@ -139,6 +149,7 @@ export default function RegistroForm({
     if (!novo.data || !novo.processo || !novo.minutos) return;
     if (cpfTouched && !cpfValid) return;
     if (!processoValid) return;
+    if (!controleValid) return;
     onSubmit({ ...novo, cpf: cpfDigits || undefined });
     setNovo({ ...EMPTY });
     setCpfHistory(null);
@@ -176,6 +187,7 @@ export default function RegistroForm({
                   tipoNatureza: e.target.value,
                   tipoProcesso: "",
                   tipoControle: "",
+                  fase: "",
                   tipoAto: "",
                   subtipoAto: "",
                   assuntoJudicial: "",
@@ -237,11 +249,21 @@ export default function RegistroForm({
                 <Label>Trilha</Label>
                 <Input
                   list="trilhas-sugestoes"
-                  placeholder="Nome da trilha"
+                  placeholder="Digite para buscar..."
                   value={novo.trilha || ""}
                   onChange={(e) => setNovo({ ...novo, trilha: e.target.value })}
                 />
-                <datalist id="trilhas-sugestoes" />
+                <datalist id="trilhas-sugestoes">
+                  {TRILHAS.map((t) => (
+                    <option key={t.v} value={t.l} />
+                  ))}
+                </datalist>
+                {novo.trilha &&
+                  !TRILHAS.some((t) => t.l === novo.trilha) && (
+                    <p className="text-xs text-destructive mt-1">
+                      Selecione uma trilha da lista.
+                    </p>
+                  )}
               </div>
             </>
           )}
@@ -360,6 +382,27 @@ export default function RegistroForm({
               </p>
             )}
           </div>
+
+          {novo.tipoNatureza === "controle" && (
+            <div>
+              <Label>Fase</Label>
+              <select
+                value={novo.fase || ""}
+                onChange={(e) => setNovo({ ...novo, fase: e.target.value })}
+                className="w-full border rounded-md h-10 px-3 bg-background text-sm"
+              >
+                <option value="">Selecione</option>
+                {FASES_CONTROLE.map((f) => (
+                  <option key={f.v} value={f.v}>
+                    {f.l}
+                  </option>
+                ))}
+              </select>
+              <p className="text-xs text-muted-foreground mt-1">
+                O status abaixo se refere a esta fase.
+              </p>
+            </div>
+          )}
 
           <div>
             <Label>Status</Label>
@@ -791,6 +834,7 @@ export default function RegistroForm({
             !novo.minutos ||
             (cpfTouched && !cpfValid) ||
             !processoValid ||
+            !controleValid ||
             submitting
           }
           className="gap-2"

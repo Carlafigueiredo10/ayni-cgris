@@ -91,6 +91,7 @@ export default function AdminEquipes() {
   }, [hierarchy, isAdmin, isManagerCgris, isManager, profile?.team_id]);
 
   if (authLoading) return null;
+  if (profile === null) return null;
   if (!isAdmin && !isManagerCgris && !isManager) {
     return <Navigate to="/meu-painel" replace />;
   }

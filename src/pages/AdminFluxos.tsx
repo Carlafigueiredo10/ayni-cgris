@@ -10,11 +10,12 @@ import { Label } from "@/components/ui/label";
 import { ArrowLeft, GitBranch, Save } from "lucide-react";
 
 export default function AdminFluxos() {
-  const { isAdmin, isManagerCgris, isManager, loading: authLoading } = useAuth();
+  const { isAdmin, isManagerCgris, isManager, profile, loading: authLoading } = useAuth();
   const canEdit = isAdmin || isManagerCgris || isManager;
   const { caixas, loading, updateCaixa } = useSeiCaixas({ onlyAtivo: false });
 
   if (authLoading) return null;
+  if (profile === null) return null;
   if (!canEdit) return <Navigate to="/fluxos" replace />;
 
   return (

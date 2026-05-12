@@ -57,7 +57,7 @@ const csvHeadersServidor = [
 ];
 
 export default function Relatorios() {
-  const { isAdmin, isManagerCgris, isManager, loading: authLoading } = useAuth();
+  const { isAdmin, isManagerCgris, isManager, profile, loading: authLoading } = useAuth();
   const canAccess = isAdmin || isManagerCgris || isManager;
 
   const { rows, loading, fetchReport } = useTeamReport();
@@ -93,7 +93,8 @@ export default function Relatorios() {
   }, [authLoading, canAccess, teamFilter, monthFilter, fetchReport]);
 
   if (authLoading) return null;
-  if (!canAccess) return <Navigate to="/productivity" replace />;
+  if (profile === null) return null;
+  if (!canAccess) return <Navigate to="/meu-painel" replace />;
 
   const totals = rows.reduce(
     (acc, r) => ({

@@ -11,6 +11,7 @@ export type Registro = {
   tipoNatureza?: string;
   tipoProcesso?: string;
   tipoControle?: string;
+  fase?: string;
   tipoAto?: string;
   subtipoAto?: string;
   cpf?: string;
@@ -49,6 +50,7 @@ export type RegistroDB = {
   tipo_natureza: string | null;
   tipo_processo: string | null;
   tipo_controle: string | null;
+  fase: string | null;
   tipo_ato: string | null;
   subtipo_ato: string | null;
   cpf: string | null;

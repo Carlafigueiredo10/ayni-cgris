@@ -118,3 +118,45 @@ export const FAIXAS_LOTE_INDICIOS: Option[] = [
   { v: "100_500", l: "100 a 500" },
   { v: "mais_500", l: "Mais de 500" },
 ];
+
+// Fases das demandas de controle (COCON). O status (Concluido/Encaminhado/etc.)
+// se refere a esta fase, nao ao processo inteiro — um processo pode
+// ter notificacao concluida, depois defesa, depois recurso, etc.
+export const FASES_CONTROLE: Option[] = [
+  { v: "notificacao", l: "Notificação" },
+  { v: "defesa", l: "Defesa" },
+  { v: "recurso", l: "Recurso" },
+  { v: "solicitacao_informacoes", l: "Solicitação de informações" },
+];
+
+// Trilhas oficiais da CGRIS (lista fechada — nao existem outras).
+// Ordem definida pela Carla; o campo permite busca por digitacao.
+export const TRILHAS: Option[] = [
+  { v: "acumulacao_irregular_cargos", l: "Acumulação irregular de cargos" },
+  { v: "acumulacao_irregular_vpni_quintos_gadf", l: "Acumulação irregular de VPNI Quintos ou Função Comissionada com a GADF" },
+  { v: "aposentadoria_invalidez_retorno_atividade", l: "Aposentadoria por invalidez para beneficiário em condição de retornar à atividade" },
+  { v: "ato_pessoal_avocado_controle_interno", l: "Ato de pessoal avocado do controle interno" },
+  { v: "auxilio_alimentacao_duplicidade", l: "Auxílio alimentação pago em duplicidade" },
+  { v: "auxilio_invalidez_outro_vinculo", l: "Auxílio invalidez para beneficiário em atividade em outro vínculo" },
+  { v: "dedicacao_exclusiva_desrespeitada", l: "Dedicação exclusiva desrespeitada" },
+  { v: "descumprimento_jornada_trabalho", l: "Descumprimento de jornada de trabalho" },
+  { v: "inativo_sem_ato_concessao_aposentadoria", l: "Inativo sem ato de concessão de aposentadoria" },
+  { v: "inconsistencia_datas_pensao", l: "Inconsistência de datas em pensão" },
+  { v: "inobservancia_par1_art24_ec103", l: "Inobservância do §1º do Art. 24 da EC 103/2019" },
+  { v: "inobservancia_par2_art24_ec103", l: "Inobservância do §2º do Art. 24 da EC 103/2019" },
+  { v: "inobservancia_teto_pensionistas_outro_vinculo", l: "Inobservância do teto para pensionistas que possuem outro vínculo público" },
+  { v: "manutencao_rubrica_contrariando_tcu", l: "Manutenção de rubrica em folha contrariando determinação do TCU" },
+  { v: "pgto_indevido_parcela_judicial_28_86", l: "Pagamento indevido de parcela judicial 28,86%" },
+  { v: "pgto_indevido_parcela_judicial_13_23", l: "Pagamento indevido de parcela judicial 13,23%" },
+  { v: "parcela_incompativel_subsidio", l: "Parcela incompatível com subsídio" },
+  { v: "pensionista_uniao_estavel_filha_maior_solteira", l: "Pensionista em união estável enquadrada como filha maior solteira" },
+  { v: "pensionista_filha_maior_solteira_cargo_publico", l: "Pensionista enquadrada como filha maior solteira ocupando cargo público" },
+  { v: "pensionista_falecido_com_remuneracao", l: "Pensionista falecido com remuneração" },
+  { v: "pensionista_mantido_folha_ato_concessao_ilegal", l: "Pensionista mantido em folha, apesar do ato de concessão julgado ilegal" },
+  { v: "reajuste_indevido_beneficio_especial_aposentadoria", l: "Reajuste indevido de Benefício Especial de aposentadoria" },
+  { v: "reajuste_indevido_proventos_pensao", l: "Reajuste indevido de proventos de pensão" },
+  { v: "redutor_pensao_ec41_insuficiente", l: "Redutor de pensão da EC 41/2003 insuficiente" },
+  { v: "servidor_ativo_mais_75_anos", l: "Servidor ativo com mais de 75 anos" },
+  { v: "servidor_mantido_inativo_aposentadoria_ilegal", l: "Servidor mantido em folha como inativo, apesar do ato de aposentadoria julgado ilegal" },
+  { v: "servidor_mantido_folha_admissao_ilegal", l: "Servidor mantido em folha, apesar do ato de admissão julgado ilegal" },
+];

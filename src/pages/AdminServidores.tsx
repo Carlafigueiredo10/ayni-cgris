@@ -17,7 +17,7 @@ import { ArrowLeft, Plus, Users } from "lucide-react";
 import ServidorEditModal from "@/components/admin/ServidorEditModal";
 
 export default function AdminServidores() {
-  const { isAdmin, loading: authLoading } = useAuth();
+  const { isAdmin, profile, loading: authLoading } = useAuth();
   const { servidores, loading, save } = useServidoresAdmin();
 
   const [busca, setBusca] = useState("");
@@ -40,7 +40,8 @@ export default function AdminServidores() {
   }, [servidores, busca, showInativos]);
 
   if (authLoading) return null;
-  if (!isAdmin) return <Navigate to="/productivity" replace />;
+  if (profile === null) return null;
+  if (!isAdmin) return <Navigate to="/meu-painel" replace />;
 
   const handleAdd = () => {
     setEditing(null);

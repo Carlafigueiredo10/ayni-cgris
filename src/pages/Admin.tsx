@@ -104,8 +104,12 @@ export default function Admin() {
     teams.find((t) => t.id === teamId)?.code?.toUpperCase() || "-";
 
   if (authLoading) return null;
+  // Profile pode demorar em cold start (Supabase free tier). Enquanto o user
+  // existe mas o profile ainda não chegou, espera — NUNCA redireciona com
+  // base em role indefinida, senao um admin com bootstrap lento e expulso.
+  if (profile === null) return null;
   if (!isAdmin && !isManagerCgris && !isManager) {
-    return <Navigate to="/productivity" replace />;
+    return <Navigate to="/meu-painel" replace />;
   }
 
   return (
