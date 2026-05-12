@@ -41,8 +41,11 @@ const AuthContext = createContext<AuthContextType>({
 export const useAuth = () => useContext(AuthContext);
 
 // Carrega o profile com timeout duro — nunca pendura.
+// Estratégia: tenta 1x, se der timeout tenta de novo silenciosamente.
+// Só registra warn no console se as 2 tentativas falharem (cold start prolongado).
 async function loadProfileSafe(userId: string): Promise<Profile | null> {
-  const TIMEOUT_MS = 4000;
+  const TIMEOUT_MS = 8000;
+  const TIMEOUT_SENTINEL = Symbol("timeout");
 
   const fetchProfile = async (): Promise<Profile | null> => {
     try {
@@ -63,15 +66,23 @@ async function loadProfileSafe(userId: string): Promise<Profile | null> {
     }
   };
 
-  return Promise.race([
-    fetchProfile(),
-    new Promise<null>((resolve) =>
-      setTimeout(() => {
-        console.warn("[Auth] loadProfile timeout");
-        resolve(null);
-      }, TIMEOUT_MS)
-    ),
-  ]);
+  const attempt = (): Promise<Profile | null | typeof TIMEOUT_SENTINEL> =>
+    Promise.race([
+      fetchProfile(),
+      new Promise<typeof TIMEOUT_SENTINEL>((resolve) =>
+        setTimeout(() => resolve(TIMEOUT_SENTINEL), TIMEOUT_MS)
+      ),
+    ]);
+
+  const first = await attempt();
+  if (first !== TIMEOUT_SENTINEL) return first;
+
+  const second = await attempt();
+  if (second === TIMEOUT_SENTINEL) {
+    console.warn("[Auth] loadProfile timeout (após 2 tentativas)");
+    return null;
+  }
+  return second;
 }
 
 function clearSupabaseStorage() {
