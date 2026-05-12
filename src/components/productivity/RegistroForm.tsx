@@ -440,8 +440,17 @@ export default function RegistroForm({
                 {(novo.motivoTempo === "complexo" ||
                   novo.motivoTempo === "familiaridade") && (
                   <div className="ml-6">
-                    <Label className="text-xs">Qual assunto?</Label>
+                    <Label className="text-xs">
+                      {novo.motivoTempo === "complexo"
+                        ? "Detalhe a complexidade"
+                        : "Detalhe a dificuldade"}
+                    </Label>
                     <Input
+                      placeholder={
+                        novo.motivoTempo === "complexo"
+                          ? "Ex: múltiplas decisões conflitantes, cálculos complexos"
+                          : "Ex: primeira vez nesse tipo de processo"
+                      }
                       value={
                         novo.motivoTempo === "complexo"
                           ? novo.assunto || ""
