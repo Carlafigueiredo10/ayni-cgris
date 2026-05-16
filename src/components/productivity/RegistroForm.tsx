@@ -123,11 +123,14 @@ export default function RegistroForm({
   const processoValid = isValidSei(novo.processo ?? "");
 
   const isControle = novo.tipoNatureza === "controle";
+  const isAcordao = novo.tipoControle === "acordao";
+  const trilhaPreenchidaOk =
+    !novo.trilha || TRILHAS.some((t) => t.l === novo.trilha);
   const controleValid =
     !isControle ||
     (!!novo.fase &&
-      !!novo.trilha &&
-      TRILHAS.some((t) => t.l === novo.trilha));
+      (isAcordao || !!novo.trilha) &&
+      trilhaPreenchidaOk);
 
   useEffect(() => {
     if (!onCpfCheck || cpfDigits.length !== 11 || !cpfValid) {
@@ -243,10 +246,19 @@ export default function RegistroForm({
                   <option value="">Selecione</option>
                   <option value="indicio">Indicio</option>
                   <option value="processo">Processo</option>
+                  <option value="acordao">Acórdão</option>
                 </select>
               </div>
               <div>
-                <Label>Trilha</Label>
+                <Label>
+                  Trilha
+                  {novo.tipoControle === "acordao" && (
+                    <span className="text-muted-foreground font-normal">
+                      {" "}
+                      (opcional)
+                    </span>
+                  )}
+                </Label>
                 <Input
                   list="trilhas-sugestoes"
                   placeholder="Digite para buscar..."
